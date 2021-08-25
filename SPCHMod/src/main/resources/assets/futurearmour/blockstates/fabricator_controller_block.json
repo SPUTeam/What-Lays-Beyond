@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "multiblock_assembled=false,facing=north": { "model": "futurearmour:block/fabricator_controller_block"},
+    "multiblock_assembled=false,facing=east": { "model": "futurearmour:block/fabricator_controller_block", "y": 90 },
+    "multiblock_assembled=false,facing=south": { "model": "futurearmour:block/fabricator_controller_block", "y": 180 },
+    "multiblock_assembled=false,facing=west": { "model": "futurearmour:block/fabricator_controller_block", "y": 270 },
+    "multiblock_assembled=true,facing=north": { "model": "futurearmour:block/fabricator"},
+    "multiblock_assembled=true,facing=east": { "model": "futurearmour:block/fabricator", "y": 90 },
+    "multiblock_assembled=true,facing=south": { "model": "futurearmour:block/fabricator", "y": 180 },
+    "multiblock_assembled=true,facing=west": { "model": "futurearmour:block/fabricator", "y": 270 }
+  }
+}

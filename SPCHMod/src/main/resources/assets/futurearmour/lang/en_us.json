@@ -1,0 +1,37 @@
+{
+  "itemGroup.futurearmour" : "Best Fucking Mod Ever",
+
+  "item.futurearmour.plastic_sheet": "Plastic Sheet",
+  "item.futurearmour.nylon_roll": "Nylon Roll",
+  "item.futurearmour.carbon_fiber": "Carbon Fiber",
+  "item.futurearmour.glass_fiber": "Glass Fiber",
+  "item.futurearmour.rubber_piece": "Rubber Piece",
+  "item.futurearmour.composite_plate": "Composite Plate",
+  "item.futurearmour.copper_ingot": "Copper Ingot",
+  "item.futurearmour.magnesium_powder": "Magnesium Powder",
+  "item.futurearmour.sulfur_powder": "Sulfur Powder",
+  "item.futurearmour.saltpeter_powder": "Saltpeter Powder",
+  "item.futurearmour.steel_ingot": "Steel Ingot",
+  "item.futurearmour.titanium_ingot": "Titanium Ingot",
+  "item.futurearmour.uranium_ingot": "Uranium Ingot",
+  "item.futurearmour.uraniumsteel_ingot": "Uraniumsteel Ingot",
+  "item.futurearmour.aluminium_ingot": "Aluminium Ingot",
+
+  "block.futurearmour.fabricator_controller_block" : "Fabricator Controller",
+  "block.futurearmour.fabricator_part_block" : "Fabricator Part",
+  "block.futurearmour.titanium_ore" : "Titanium Ore",
+  "block.futurearmour.titanium_block" : "Titanium Block",
+  "block.futurearmour.aluminium_ore" : "Aluminium Ore",
+  "block.futurearmour.aluminium_block" : "Aluminium Block",
+  "block.futurearmour.copper_ore" : "Copper Ore",
+  "block.futurearmour.copper_block" : "Copper Block",
+  "block.futurearmour.magnesium_ore" : "Magnesium Ore",
+  "block.futurearmour.sulfur_ore" : "Sulfur Ore",
+  "block.futurearmour.uranium_ore" : "Uranium Ore",
+  "block.futurearmour.uranium_block" : "Uranium Block",
+  "block.futurearmour.steel_block" : "Steel Block",
+  "block.futurearmour.uraniumsteel_block" : "Uraniumsteel Block",
+
+  "item.futurearmour.pilot_suit_chestplate": "Pilot Suit Top",
+  "item.futurearmour.pilot_suit_leggings": "Pilot Suit Bottom"
+}

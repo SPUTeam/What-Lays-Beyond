@@ -1,0 +1,18 @@
+{
+  "type": "futurearmour:fabricating",
+  "group": "futurearmour",
+  "pattern": [
+     "xx",
+     "   ",
+    "    ",
+     "x x"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:coal"
+    }
+  },
+  "result": {
+    "item": "futurearmour:carbon_fiber"
+  }
+}

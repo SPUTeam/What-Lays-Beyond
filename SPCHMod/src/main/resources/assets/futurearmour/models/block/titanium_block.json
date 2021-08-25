@@ -1,0 +1,8 @@
+{
+  "loader": "forge:obj",
+  "model": "futurearmour:models/block/obj/titanium_block.obj",
+  "flip-v": true,
+  "textures": {
+    "particle": "futurearmour:block/titanium_block"
+  }
+}

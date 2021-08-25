@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "futurearmour:copper_ore"
+  },
+  "result": "futurearmour:copper_ingot",
+  "experience": 1.2,
+  "cookingtime": 200,
+  "group": "stuff"
+}

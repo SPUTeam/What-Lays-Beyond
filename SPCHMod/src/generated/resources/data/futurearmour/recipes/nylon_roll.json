@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "futurearmour",
+  "pattern": [
+    "x x",
+    " x ",
+    "x x"
+  ],
+  "key": {
+    "x": {
+      "item": "futurearmour:plastic_sheet"
+    }
+  },
+  "result": {
+    "item": "futurearmour:nylon_roll"
+  }
+}

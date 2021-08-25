@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "name": "uraniumsteel_block",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "futurearmour:uraniumsteel_block"
+        }
+      ]
+    }
+  ]
+}

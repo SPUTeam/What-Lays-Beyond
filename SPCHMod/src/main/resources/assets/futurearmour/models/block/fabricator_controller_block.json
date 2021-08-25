@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "futurearmour:block/fabricator_part_block",
+    "up": "futurearmour:block/fabricator_part_block",
+    "north": "futurearmour:block/fabricator_controller_block",
+    "east": "futurearmour:block/fabricator_part_block",
+    "south": "futurearmour:block/fabricator_part_block",
+    "west": "futurearmour:block/fabricator_part_block",
+    "particle": "futurearmour:block/fabricator_part_block"
+  }
+}

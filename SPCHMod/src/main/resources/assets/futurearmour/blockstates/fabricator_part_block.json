@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "multiblock_assembled=false" : { "model": "futurearmour:block/fabricator_part_block"},
+    "multiblock_assembled=true" : { "model": "minecraft:block/air"}
+  }
+}

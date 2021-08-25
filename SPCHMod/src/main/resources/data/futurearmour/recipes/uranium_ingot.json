@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "futurearmour:uranium_ore"
+  },
+  "result": "futurearmour:uranium_ingot",
+  "experience": 2.4,
+  "cookingtime": 300,
+  "group": "stuff"
+}
