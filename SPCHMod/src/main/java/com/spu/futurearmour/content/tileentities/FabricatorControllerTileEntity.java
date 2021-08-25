@@ -4,8 +4,10 @@ import com.ibm.icu.impl.IllegalIcuArgumentException;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorController;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorStateData;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
+import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.setup.BlockRegistry;
 import com.spu.futurearmour.setup.ModBlockStateProperties;
+import com.spu.futurearmour.setup.RecipeTypesRegistry;
 import com.spu.futurearmour.setup.TileEntityTypeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -16,6 +18,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -33,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
     private static final int WORK_TIME = 5 * 20;
@@ -74,12 +78,23 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         if (this.level.isClientSide()) return;
 
         //crafting
-
+        LOGGER.debug("searching");
+        FabricatorRecipe currentRecipe = getCurrentRecipe();
+        if (currentRecipe == null) return;
+        LOGGER.debug(currentRecipe.getId().toString());
     }
 
     public void playerInteract(PlayerEntity player) {
         if (!(player instanceof ServerPlayerEntity)) return;
         NetworkHooks.openGui((ServerPlayerEntity) player, this, getBlockPos());
+    }
+
+    @Nullable
+    private FabricatorRecipe getCurrentRecipe() {
+        RecipeManager recipeManager = new RecipeManager();
+        Optional<FabricatorRecipe> recipe = recipeManager.getRecipeFor(RecipeTypesRegistry.FABRICATING_RECIPE, this, level);
+        if(recipe.isPresent())LOGGER.debug(recipe.get().getResultItem().getItem().toString());
+        return recipe.orElse(null);
     }
 
     //region Assembling/Maintaining structure
