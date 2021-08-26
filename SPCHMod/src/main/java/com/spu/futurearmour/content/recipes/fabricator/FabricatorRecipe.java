@@ -18,6 +18,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -190,4 +192,6 @@ public class FabricatorRecipe implements IFabricatorRecipe {
         }
     }
     //endregion
+
+    private static Logger LOGGER = LogManager.getLogger();
 }

@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,10 +79,8 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         if (this.level.isClientSide()) return;
 
         //crafting
-        LOGGER.debug("searching");
         FabricatorRecipe currentRecipe = getCurrentRecipe();
         if (currentRecipe == null) return;
-        LOGGER.debug(currentRecipe.getId().toString());
     }
 
     public void playerInteract(PlayerEntity player) {
@@ -89,12 +88,11 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         NetworkHooks.openGui((ServerPlayerEntity) player, this, getBlockPos());
     }
 
-    @Nullable
     private FabricatorRecipe getCurrentRecipe() {
-        RecipeManager recipeManager = new RecipeManager();
-        Optional<FabricatorRecipe> recipe = recipeManager.getRecipeFor(RecipeTypesRegistry.FABRICATING_RECIPE, this, level);
-        if(recipe.isPresent())LOGGER.debug(recipe.get().getResultItem().getItem().toString());
-        return recipe.orElse(null);
+        RecipeManager recipeManager = getLevel().getRecipeManager();
+        FabricatorRecipe recipe = recipeManager.getRecipeFor(RecipeTypesRegistry.FABRICATING_RECIPE, this, getLevel()).orElse(null);
+        if(recipe != null)LOGGER.debug(recipe.getResultItem().getItem().toString());
+        return recipe;
     }
 
     //region Assembling/Maintaining structure
