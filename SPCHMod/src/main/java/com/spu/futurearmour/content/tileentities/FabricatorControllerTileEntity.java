@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
-    private static final int WORK_TIME = 2 * 20;
+    private static final int WORK_TIME = 3 * 20;
     public static final int INPUT_SLOTS_COUNT = 12;
     public static final int OUTPUT_SLOTS_COUNT = 3;
     public static final int TOTAL_SLOTS_COUNT = INPUT_SLOTS_COUNT + OUTPUT_SLOTS_COUNT;
@@ -87,7 +87,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     //region Crafting
     private void tickCrafting(ResourceLocation recipeId, FabricatorStateData stateData) {
         FabricatorRecipe newRecipe;
-        if (recipeId == null || recipeId.getNamespace() != FutureArmour.MOD_ID) {
+        if (recipeId == null || !recipeId.getNamespace().equals(FutureArmour.MOD_ID)) {
             newRecipe = getCurrentRecipe();
             if (newRecipe == null || !canStartCraft(newRecipe, outputInventory)) return;
             startCraft(newRecipe, stateData, inputInventory);
@@ -96,7 +96,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         RecipeManager recipeManager = getLevel().getRecipeManager();
         FabricatorRecipe currentRecipe = (FabricatorRecipe) recipeManager.byKey(currentRecipeID).get();
 
-        if (fabricatorStateData.craftTimeElapsed >= fabricatorStateData.craftTimeForCompletion) {
+        if (fabricatorStateData.get(0) >= fabricatorStateData.get(1)) {
             finishCraft(currentRecipe);
             return;
         }
@@ -113,9 +113,9 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     }
 
     private void proceedCraft(FabricatorStateData stateData) {
-        updateStateData(stateData.craftTimeElapsed + 1);
+        updateStateData(stateData.get(0) + 1);
         setChanged();
-        LOGGER.debug("ticks elapsed: " + stateData.craftTimeElapsed);
+        LOGGER.debug("ticks elapsed: " + stateData.get(0));
     }
 
     private void finishCraft(FabricatorRecipe recipe) {
