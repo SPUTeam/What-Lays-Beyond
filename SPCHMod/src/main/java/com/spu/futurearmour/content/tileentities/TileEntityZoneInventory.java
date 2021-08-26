@@ -131,6 +131,12 @@ public class TileEntityZoneInventory implements IInventory {
         return itemStackHandler.isItemValid(index, stack);
     }
 
+    public void decreaseAllStacks(){
+        for(int i = 0; i < itemStackHandler.getSlots(); ++i){
+            itemStackHandler.extractItem(i,1,false);
+        }
+    }
+
     public boolean doesItemStackFit(int index, ItemStack itemStackToInsert) {
         ItemStack leftoverItemStack = itemStackHandler.insertItem(index, itemStackToInsert, true);
         return leftoverItemStack.isEmpty();

@@ -57,4 +57,10 @@ public class FabricatorStateData implements IIntArray {
         craftTimeElapsed = nbt.getInt("CraftTimeElapsed");
         craftTimeForCompletion = nbt.getInt("CraftTimeForCompletion");
     }
+
+    public void clean(){
+        for (int i =0; i < END_OF_DATA_INDEX_PLUS_ONE; i++){
+            set(i, 0);
+        }
+    }
 }

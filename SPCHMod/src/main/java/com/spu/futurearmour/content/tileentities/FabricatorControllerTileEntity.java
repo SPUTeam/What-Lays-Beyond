@@ -1,6 +1,7 @@
 package com.spu.futurearmour.content.tileentities;
 
 import com.ibm.icu.impl.IllegalIcuArgumentException;
+import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorController;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorStateData;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
@@ -25,6 +26,7 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -40,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
-    private static final int WORK_TIME = 5 * 20;
+    private static final int WORK_TIME = 2 * 20;
     public static final int INPUT_SLOTS_COUNT = 12;
     public static final int OUTPUT_SLOTS_COUNT = 3;
     public static final int TOTAL_SLOTS_COUNT = INPUT_SLOTS_COUNT + OUTPUT_SLOTS_COUNT;
@@ -51,8 +53,8 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
 
     private TileEntityZoneInventory inputInventory;
     private TileEntityZoneInventory outputInventory;
-
     private final FabricatorStateData fabricatorStateData = new FabricatorStateData();
+    private ResourceLocation currentRecipeID = new ResourceLocation("");
 
     public FabricatorControllerTileEntity() {
         super(TileEntityTypeRegistry.FABRICATOR_CONTROLLER_TILE_ENTITY_TYPE.get());
@@ -79,8 +81,52 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         if (this.level.isClientSide()) return;
 
         //crafting
-        FabricatorRecipe currentRecipe = getCurrentRecipe();
-        if (currentRecipe == null) return;
+        tickCrafting(currentRecipeID, fabricatorStateData);
+    }
+
+    //region Crafting
+    private void tickCrafting(ResourceLocation recipeId, FabricatorStateData stateData) {
+        FabricatorRecipe newRecipe;
+        if (recipeId == null || recipeId.getNamespace() != FutureArmour.MOD_ID) {
+            newRecipe = getCurrentRecipe();
+            if (newRecipe == null || !canStartCraft(newRecipe, outputInventory)) return;
+            startCraft(newRecipe, stateData, inputInventory);
+        }
+
+        RecipeManager recipeManager = getLevel().getRecipeManager();
+        FabricatorRecipe currentRecipe = (FabricatorRecipe) recipeManager.byKey(currentRecipeID).get();
+
+        if (fabricatorStateData.craftTimeElapsed >= fabricatorStateData.craftTimeForCompletion) {
+            finishCraft(currentRecipe);
+            return;
+        }
+
+        proceedCraft(stateData);
+    }
+
+    private void startCraft(FabricatorRecipe recipe, FabricatorStateData stateData, TileEntityZoneInventory inputInventory) {
+        updateStateData(recipe);
+        inputInventory.decreaseAllStacks();
+        proceedCraft(stateData);
+        setChanged();
+        LOGGER.debug("started " + currentRecipeID.toString());
+    }
+
+    private void proceedCraft(FabricatorStateData stateData) {
+        updateStateData(stateData.craftTimeElapsed + 1);
+        setChanged();
+        LOGGER.debug("ticks elapsed: " + stateData.craftTimeElapsed);
+    }
+
+    private void finishCraft(FabricatorRecipe recipe) {
+        updateStateData(null);
+        setChanged();
+        LOGGER.debug("crafted");
+    }
+
+    private boolean canStartCraft(FabricatorRecipe recipe, TileEntityZoneInventory outputInventory) {
+
+        return true;
     }
 
     public void playerInteract(PlayerEntity player) {
@@ -91,9 +137,30 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private FabricatorRecipe getCurrentRecipe() {
         RecipeManager recipeManager = getLevel().getRecipeManager();
         FabricatorRecipe recipe = recipeManager.getRecipeFor(RecipeTypesRegistry.FABRICATING_RECIPE, this, getLevel()).orElse(null);
-        if(recipe != null)LOGGER.debug(recipe.getResultItem().getItem().toString());
         return recipe;
     }
+
+    private void updateStateData(int craftTicksElapsed) {
+        int maxTicksForCurrentRecipe = fabricatorStateData.get(1);
+        //clamp 0,maxTicks (thanks java, very cool)
+        int validatedTicksLeft = craftTicksElapsed > maxTicksForCurrentRecipe ? maxTicksForCurrentRecipe : craftTicksElapsed < 0 ? 0 : craftTicksElapsed;
+        fabricatorStateData.set(0, validatedTicksLeft);
+    }
+
+    private void updateStateData(FabricatorRecipe newRecipe) {
+        if (newRecipe == null) {
+            fabricatorStateData.clean();
+            currentRecipeID = null;
+            return;
+        }
+
+        //TODO read max time from recipe json
+        int maxTicksForRecipe = WORK_TIME;
+        currentRecipeID = newRecipe.getId();
+        fabricatorStateData.set(0, 0);
+        fabricatorStateData.set(1, maxTicksForRecipe);
+    }
+    //endregion
 
     //region Assembling/Maintaining structure
     public boolean isAssembled() {
@@ -239,6 +306,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     public CompoundNBT save(CompoundNBT nbt) {
         super.save(nbt);
         fabricatorStateData.saveToNBT(nbt);
+        nbt.putString("current_recipe_id", currentRecipeID.toString());
         nbt.put("input_slots", inputInventory.serializeNBT());
         nbt.put("output_slots", outputInventory.serializeNBT());
         return nbt;
@@ -249,6 +317,9 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         super.load(state, nbt);
 
         fabricatorStateData.loadFromNBT(nbt);
+
+        String currentRecipeIdString = nbt.getString("current_recipe_id");
+        currentRecipeID = ResourceLocation.tryParse(currentRecipeIdString);
 
         CompoundNBT inventoryNBT = nbt.getCompound("input_slots");
         inputInventory.deserializeNBT(inventoryNBT);
