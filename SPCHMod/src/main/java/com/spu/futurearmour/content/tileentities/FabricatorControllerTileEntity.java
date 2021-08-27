@@ -37,12 +37,10 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
-    private static final int WORK_TIME = 3 * 20;
+    private static final int WORK_TIME = 2 * 20;
     public static final int INPUT_SLOTS_COUNT = 12;
     public static final int OUTPUT_SLOTS_COUNT = 3;
     public static final int TOTAL_SLOTS_COUNT = INPUT_SLOTS_COUNT + OUTPUT_SLOTS_COUNT;
@@ -97,7 +95,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         FabricatorRecipe currentRecipe = (FabricatorRecipe) recipeManager.byKey(currentRecipeID).get();
 
         if (fabricatorStateData.get(0) >= fabricatorStateData.get(1)) {
-            finishCraft(currentRecipe);
+            finishCraft(currentRecipe, outputInventory);
             return;
         }
 
@@ -107,7 +105,6 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private void startCraft(FabricatorRecipe recipe, FabricatorStateData stateData, TileEntityZoneInventory inputInventory) {
         updateStateData(recipe);
         inputInventory.decreaseAllStacks();
-        proceedCraft(stateData);
         setChanged();
         LOGGER.debug("started " + currentRecipeID.toString());
     }
@@ -115,18 +112,20 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private void proceedCraft(FabricatorStateData stateData) {
         updateStateData(stateData.get(0) + 1);
         setChanged();
-        LOGGER.debug("ticks elapsed: " + stateData.get(0));
+        //LOGGER.debug("ticks elapsed: " + stateData.get(0));
     }
 
-    private void finishCraft(FabricatorRecipe recipe) {
+    private void finishCraft(FabricatorRecipe recipe, TileEntityZoneInventory outputInventory) {
+        //ItemStack leftoverStack = outputInventory.insertStack(recipe.getResultItem().copy());
+        //LOGGER.debug(leftoverStack.getCount()+ " : " +leftoverStack.getDisplayName().getString());
+        outputInventory.setItem(0, recipe.getResultItem().copy());
         updateStateData(null);
         setChanged();
-        LOGGER.debug("crafted");
+        //LOGGER.debug("crafted" + recipe.getResultItem().copy().getDisplayName().getString());
     }
 
     private boolean canStartCraft(FabricatorRecipe recipe, TileEntityZoneInventory outputInventory) {
-
-        return true;
+        return outputInventory.canFitStack(recipe.getResultItem());
     }
 
     public void playerInteract(PlayerEntity player) {

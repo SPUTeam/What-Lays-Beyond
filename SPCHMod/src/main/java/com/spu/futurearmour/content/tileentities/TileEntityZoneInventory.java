@@ -2,8 +2,10 @@ package com.spu.futurearmour.content.tileentities;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -146,6 +148,26 @@ public class TileEntityZoneInventory implements IInventory {
     public ItemStack increaseStackSize(int index, ItemStack itemStackToInsert) {
         ItemStack leftoverItemStack = itemStackHandler.insertItem(index, itemStackToInsert, false);
         return leftoverItemStack;
+    }
+
+    public ItemStack insertStack(ItemStack stack){
+        ItemStack leftoverStack = ItemStack.EMPTY;
+        for(int i = 0; i < getContainerSize(); i++){
+            ItemStack existing = getItem(i);
+            if(ItemHandlerHelper.canItemStacksStack(stack, existing) && doesItemStackFit(i, stack)){
+                leftoverStack = increaseStackSize(i, stack);
+            }
+            if(leftoverStack.isEmpty())return ItemStack.EMPTY;
+        }
+        return leftoverStack;
+    }
+
+    public boolean canFitStack(ItemStack stack){
+        for (int i =0; i < getContainerSize(); i++){
+            ItemStack leftoverItemStack = itemStackHandler.insertItem(i, stack, true);
+            if(leftoverItemStack.isEmpty())return true;
+        }
+        return false;
     }
     //endregion
 
