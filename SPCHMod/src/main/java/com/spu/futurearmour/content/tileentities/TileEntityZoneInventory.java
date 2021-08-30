@@ -151,15 +151,11 @@ public class TileEntityZoneInventory implements IInventory {
     }
 
     public ItemStack insertStack(ItemStack stack){
-        ItemStack leftoverStack = ItemStack.EMPTY;
         for(int i = 0; i < getContainerSize(); i++){
-            ItemStack existing = getItem(i);
-            if(ItemHandlerHelper.canItemStacksStack(stack, existing) && doesItemStackFit(i, stack)){
-                leftoverStack = increaseStackSize(i, stack);
-            }
-            if(leftoverStack.isEmpty())return ItemStack.EMPTY;
+            stack = increaseStackSize(i, stack);
+            if(stack.isEmpty())return stack;
         }
-        return leftoverStack;
+        return stack;
     }
 
     public boolean canFitStack(ItemStack stack){

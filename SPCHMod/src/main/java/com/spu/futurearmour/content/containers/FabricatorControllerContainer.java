@@ -103,37 +103,13 @@ public class FabricatorControllerContainer extends Container {
 
     @OnlyIn(Dist.CLIENT)
     public int getProgressArrowScale() {
-        int progress = this.fabricatorStateData.get(0);
+        int ticksElapsed = fabricatorStateData.get(0);
+        int ticksToFinish = fabricatorStateData.get(1);
+        if (ticksToFinish <= 0) return 0;
+
         int progressArrowHeight = 29;
-        if (progress > 0) {
-            return progress * progressArrowHeight / 100;
-        }
-        return 0;
-        //TODO THIS SHIT BROKEN
-    }
-
-    private enum SlotZone {
-        INPUT_ZONE(0, 12),
-        OUTPUT_ZONE(12, 3),
-        PLAYER_MAIN_INVENTORY(15, 27),
-        PLAYER_HOTBAR(27, 9);
-
-        SlotZone(int firstIndex, int numberOfSlots) {
-            this.firstIndex = firstIndex;
-            this.slotCount = numberOfSlots;
-            this.lastIndexPlus1 = firstIndex + numberOfSlots;
-        }
-
-        public final int firstIndex;
-        public final int slotCount;
-        public final int lastIndexPlus1;
-
-        public static SlotZone getZoneFromIndex(int slotIndex) {
-            for (SlotZone slotZone : SlotZone.values()) {
-                if (slotIndex >= slotZone.firstIndex && slotIndex < slotZone.lastIndexPlus1) return slotZone;
-            }
-            throw new IndexOutOfBoundsException("Unexpected slotIndex");
-        }
+        double progress = ((double)ticksElapsed / (double) ticksToFinish) * (double) progressArrowHeight;
+        return (int) progress;
     }
 
     private static Logger LOGGER = LogManager.getLogger();
