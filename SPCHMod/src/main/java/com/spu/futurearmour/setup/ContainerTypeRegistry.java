@@ -1,19 +1,16 @@
 package com.spu.futurearmour.setup;
 
 import com.spu.futurearmour.FutureArmour;
-import com.spu.futurearmour.client.gui.FabricatorScreen;
+import com.spu.futurearmour.content.client.gui.FabricatorScreen;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
