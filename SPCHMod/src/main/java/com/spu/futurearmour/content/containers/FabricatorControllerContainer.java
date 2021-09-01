@@ -108,7 +108,7 @@ public class FabricatorControllerContainer extends Container {
         if (ticksToFinish <= 0) return 0;
 
         int progressArrowHeight = 29;
-        double progress = ((double)ticksElapsed / (double) ticksToFinish) * (double) progressArrowHeight;
+        double progress = ((double) ticksElapsed / (double) ticksToFinish) * (double) progressArrowHeight;
         return (int) progress;
     }
 

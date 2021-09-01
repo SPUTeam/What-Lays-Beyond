@@ -54,7 +54,6 @@ public class FutureArmour
 
     }
 
-    @SubscribeEvent
     private void setup(final FMLCommonSetupEvent event){
         Networking.registerMessages();
     }

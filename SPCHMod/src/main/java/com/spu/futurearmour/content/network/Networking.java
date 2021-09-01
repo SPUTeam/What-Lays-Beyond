@@ -1,11 +1,14 @@
 package com.spu.futurearmour.content.network;
 
 import com.spu.futurearmour.FutureArmour;
-import com.spu.futurearmour.content.network.messages.fabricator.HandlerToggleFabricatorCrafting;
-import com.spu.futurearmour.content.network.messages.fabricator.MessageToggleFabricatorCrafting;
+import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
+import com.spu.futurearmour.content.network.messages.fabricator.CHandlerToggleFabricatorCrafting;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+
+import java.util.Optional;
 
 public class Networking {
     public static final String MESSAGE_PROTOCOL_VERSION = "1.0";
@@ -22,10 +25,11 @@ public class Networking {
                 Networking::isThisProtocolAcceptedByServer);
 
         simpleChannel.registerMessage(TOGGLE_FABRICATOR_ID,
-                MessageToggleFabricatorCrafting.class,
-                MessageToggleFabricatorCrafting::encode,
-                MessageToggleFabricatorCrafting::decode,
-                HandlerToggleFabricatorCrafting::onMessageReceived
+                CTSMessageToggleFabricatorCrafting.class,
+                CTSMessageToggleFabricatorCrafting::encode,
+                CTSMessageToggleFabricatorCrafting::decode,
+                CHandlerToggleFabricatorCrafting::onMessageReceived,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
                 );
     }
 

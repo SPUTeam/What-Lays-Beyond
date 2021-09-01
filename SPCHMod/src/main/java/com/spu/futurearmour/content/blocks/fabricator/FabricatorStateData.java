@@ -6,10 +6,19 @@ import net.minecraft.util.IIntArray;
 public class FabricatorStateData implements IIntArray {
     public int craftTimeElapsed;
     public int craftTimeForCompletion;
+    public int craftingIsOn;
+    public int fabricatorPosX;
+    public int fabricatorPosY;
+    public int fabricatorPosZ;
+
 
     private final int CRAFT_TIME_INDEX = 0;
     private final int CRAFT_TIME_FOR_COMPLETION_INDEX = 1;
-    private final int END_OF_DATA_INDEX_PLUS_ONE = 2;
+    private final int CRAFTING_IS_ON_INDEX = 2;
+    private final int TE_POS_X_INDEX = 3;
+    private final int TE_POS_Y_INDEX = 4;
+    private final int TE_POS_Z_INDEX = 5;
+    private final int END_OF_DATA_INDEX_PLUS_ONE = 6;
 
     @Override
     public int get(int index) {
@@ -19,6 +28,14 @@ public class FabricatorStateData implements IIntArray {
                 return craftTimeElapsed;
             case CRAFT_TIME_FOR_COMPLETION_INDEX:
                 return craftTimeForCompletion;
+            case CRAFTING_IS_ON_INDEX:
+                return craftingIsOn;
+            case TE_POS_X_INDEX:
+                return fabricatorPosX;
+            case TE_POS_Y_INDEX:
+                return fabricatorPosY;
+            case TE_POS_Z_INDEX:
+                return fabricatorPosZ;
             default:
                 return 0;
         }
@@ -33,6 +50,21 @@ public class FabricatorStateData implements IIntArray {
                 break;
             case CRAFT_TIME_FOR_COMPLETION_INDEX:
                 craftTimeForCompletion = value;
+                break;
+            case CRAFTING_IS_ON_INDEX:
+                if(value != 1 && value != 0){
+                    throw new IllegalArgumentException("Must be either 1 or 0");
+                }
+                craftingIsOn = value;
+                break;
+            case TE_POS_X_INDEX:
+                fabricatorPosX = value;
+                break;
+            case TE_POS_Y_INDEX:
+                fabricatorPosY = value;
+                break;
+            case TE_POS_Z_INDEX:
+                fabricatorPosZ = value;
                 break;
         }
     }

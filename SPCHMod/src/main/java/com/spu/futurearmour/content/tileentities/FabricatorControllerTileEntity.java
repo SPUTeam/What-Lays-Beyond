@@ -5,6 +5,7 @@ import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorController;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorStateData;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
+import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.setup.BlockRegistry;
 import com.spu.futurearmour.setup.ModBlockStateProperties;
@@ -28,6 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -53,6 +55,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private TileEntityZoneInventory outputInventory;
     private final FabricatorStateData fabricatorStateData = new FabricatorStateData();
     private ResourceLocation currentRecipeID = new ResourceLocation("");
+    private boolean craftingIsOn = false;
 
     public FabricatorControllerTileEntity() {
         super(TileEntityTypeRegistry.FABRICATOR_CONTROLLER_TILE_ENTITY_TYPE.get());
@@ -153,6 +156,13 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         currentRecipeID = newRecipe.getId();
         fabricatorStateData.set(0, 0);
         fabricatorStateData.set(1, maxTicksForRecipe);
+    }
+
+    public void toggleCrafting(boolean nextState){
+        if (this.level.isClientSide()) return;
+
+        Vector3d vectorPosition = new Vector3d(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
+        CTSMessageToggleFabricatorCrafting message = new CTSMessageToggleFabricatorCrafting(vectorPosition, nextState);
     }
     //endregion
 
@@ -303,6 +313,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         nbt.putString("current_recipe_id", currentRecipeID.toString());
         nbt.put("input_slots", inputInventory.serializeNBT());
         nbt.put("output_slots", outputInventory.serializeNBT());
+        nbt.putBoolean("craftingIsOn", craftingIsOn);
         return nbt;
     }
 
@@ -320,6 +331,8 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
 
         inventoryNBT = nbt.getCompound("output_slots");
         outputInventory.deserializeNBT(inventoryNBT);
+
+        craftingIsOn = nbt.getBoolean("craftingIsOn");
 
         if (inputInventory.getContainerSize() != INPUT_SLOTS_COUNT
                 || outputInventory.getContainerSize() != OUTPUT_SLOTS_COUNT) {
