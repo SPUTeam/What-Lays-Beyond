@@ -2,7 +2,7 @@ package com.spu.futurearmour.content.network;
 
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
-import com.spu.futurearmour.content.network.messages.fabricator.CHandlerToggleFabricatorCrafting;
+import com.spu.futurearmour.content.network.messages.fabricator.SHandlerToggleFabricatorCrafting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -28,7 +28,7 @@ public class Networking {
                 CTSMessageToggleFabricatorCrafting.class,
                 CTSMessageToggleFabricatorCrafting::encode,
                 CTSMessageToggleFabricatorCrafting::decode,
-                CHandlerToggleFabricatorCrafting::onMessageReceived,
+                SHandlerToggleFabricatorCrafting::onMessageReceived,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
                 );
     }

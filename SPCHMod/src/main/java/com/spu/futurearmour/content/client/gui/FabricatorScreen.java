@@ -4,9 +4,13 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
+import com.spu.futurearmour.content.network.Networking;
+import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -29,6 +33,12 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     }
 
     @Override
+    protected void init() {
+        super.init();
+        addCraftButton();
+    }
+
+    @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
@@ -46,6 +56,21 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         renderResultSlots(matrixStack, PARTS_ONE_TEXTURE);
         renderProgressArrowBG(matrixStack, PARTS_ONE_TEXTURE);
         renderProgressArrowOverlay(matrixStack, PARTS_ONE_TEXTURE, menu.getProgressArrowScale());
+    }
+
+    private void addCraftButton(){
+        Vector3i centerPos = centerPosForSize(44, 21);
+        int posX = centerPos.getX() + 101;
+        int posY = centerPos.getY() + 8;
+        addButton(new ImageButton(
+                posX,posY,
+                44,21,
+                0,175,24,
+                PARTS_ONE_TEXTURE,
+                (button) ->{
+                    Networking.simpleChannel.sendToServer(new CTSMessageToggleFabricatorCrafting(new Vector3d(0,0,0), true));
+                }
+        ));
     }
 
     private void renderProgressArrowOverlay(MatrixStack matrixStack, ResourceLocation texture, int heightToRender) {
@@ -98,7 +123,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         int posX = centerPos.getX() + 93;
         int posY = centerPos.getY() + 72;
 
-        blit(matrixStack, posX, posY, 0, 81, 85, 170);
+        blit(matrixStack, posX, posY, 0, 81, 85, 75);
     }
 
     private void renderPlayerInventory(MatrixStack matrixStack, ResourceLocation texture) {

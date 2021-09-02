@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
-public class CHandlerToggleFabricatorCrafting {
+public class SHandlerToggleFabricatorCrafting {
     public static void onMessageReceived(final CTSMessageToggleFabricatorCrafting message, Supplier<NetworkEvent.Context> ctxSupplier){
         NetworkEvent.Context ctx = ctxSupplier.get();
         LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
@@ -36,12 +36,14 @@ public class CHandlerToggleFabricatorCrafting {
     }
 
     private static void processOnServer(final CTSMessageToggleFabricatorCrafting message, ServerPlayerEntity sendingPlayer){
-        ServerWorld serverWorld = sendingPlayer.getLevel();
-        TileEntity tileEntity = serverWorld.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
-        if(tileEntity instanceof FabricatorControllerTileEntity){
-            FabricatorControllerTileEntity fabricatorTileEntity = (FabricatorControllerTileEntity) tileEntity;
-            fabricatorTileEntity.toggleCrafting(message.getNextStateIsOn());
-        }
+        LOGGER.debug("Got message: " + message.getFabricatorPosition() + " | " + message.getNextStateIsOn());
+
+//        ServerWorld serverWorld = sendingPlayer.getLevel();
+//        TileEntity tileEntity = serverWorld.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
+//        if(tileEntity instanceof FabricatorControllerTileEntity){
+//            FabricatorControllerTileEntity fabricatorTileEntity = (FabricatorControllerTileEntity) tileEntity;
+//            fabricatorTileEntity.toggleCrafting(message.getNextStateIsOn());
+//        }
     }
 
     private static final Logger LOGGER = LogManager.getLogger();
