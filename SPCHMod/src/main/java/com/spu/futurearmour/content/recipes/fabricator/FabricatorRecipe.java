@@ -21,9 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class FabricatorRecipe implements IFabricatorRecipe {
@@ -39,17 +37,6 @@ public class FabricatorRecipe implements IFabricatorRecipe {
         this.group = group;
         this.result = result;
         this.time = time;
-        LOGGER.debug("--------------------------------------");
-        LOGGER.debug("Built recipe:" + result.toString());
-        for(int i =0; i < ingredients.size(); i ++){
-            Optional<ItemStack> first = Arrays.stream(ingredients.get(i).getItems()).findFirst();
-            if(first.isPresent()) {
-                LOGGER.debug(i + " " + first.get());
-            }else{
-                LOGGER.debug(i);
-            }
-        }
-        LOGGER.debug("--------------------------------------");
     }
 
     @Override
@@ -162,7 +149,7 @@ public class FabricatorRecipe implements IFabricatorRecipe {
                 keys.remove(key);
 
                 int resultIndex = ch;
-                for(int i = 0; i < row; i++){
+                for (int i = 0; i < row; i++) {
                     resultIndex += getRowWidth(i);
                 }
                 result.set(resultIndex, ingredient);

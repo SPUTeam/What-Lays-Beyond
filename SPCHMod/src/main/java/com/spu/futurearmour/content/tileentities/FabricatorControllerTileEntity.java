@@ -40,6 +40,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
     public static final int INPUT_SLOTS_COUNT = 12;
@@ -87,7 +88,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     //region Crafting
     private void tickCrafting(ResourceLocation recipeId, FabricatorStateData stateData) {
         FabricatorRecipe newRecipe;
-        if (recipeId == new ResourceLocation("") || !recipeId.getNamespace().equals(FutureArmour.MOD_ID)) {
+        if (Objects.equals(recipeId, new ResourceLocation("")) || !recipeId.getNamespace().equals(FutureArmour.MOD_ID)) {
             newRecipe = getCurrentRecipe();
             if (newRecipe == null || !canStartCraft(newRecipe, outputInventory)) return;
             startCraft(newRecipe, inputInventory);

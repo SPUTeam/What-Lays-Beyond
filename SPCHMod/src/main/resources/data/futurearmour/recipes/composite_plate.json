@@ -20,6 +20,7 @@
     }
   },
   "result": {
-    "item": "futurearmour:composite_plate"
+    "item": "futurearmour:composite_plate",
+    "count": 3
   }
 }

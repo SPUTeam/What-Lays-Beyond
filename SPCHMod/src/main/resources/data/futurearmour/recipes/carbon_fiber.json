@@ -10,7 +10,8 @@
   ],
   "key": {
     "x": {
-      "item": "minecraft:coal"
+      "item": "minecraft:coal",
+      "count": "1"
     }
   },
   "result": {
