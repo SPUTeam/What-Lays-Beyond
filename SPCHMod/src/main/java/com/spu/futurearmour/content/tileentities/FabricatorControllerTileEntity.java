@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
-    private static final int WORK_TIME = 2 * 20;
     public static final int INPUT_SLOTS_COUNT = 12;
     public static final int OUTPUT_SLOTS_COUNT = 3;
     public static final int TOTAL_SLOTS_COUNT = INPUT_SLOTS_COUNT + OUTPUT_SLOTS_COUNT;
@@ -88,10 +87,10 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     //region Crafting
     private void tickCrafting(ResourceLocation recipeId, FabricatorStateData stateData) {
         FabricatorRecipe newRecipe;
-        if (recipeId == null || !recipeId.getNamespace().equals(FutureArmour.MOD_ID)) {
+        if (recipeId == new ResourceLocation("") || !recipeId.getNamespace().equals(FutureArmour.MOD_ID)) {
             newRecipe = getCurrentRecipe();
             if (newRecipe == null || !canStartCraft(newRecipe, outputInventory)) return;
-            startCraft(newRecipe, stateData, inputInventory);
+            startCraft(newRecipe, inputInventory);
         }
 
         RecipeManager recipeManager = getLevel().getRecipeManager();
@@ -105,7 +104,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         proceedCraft(stateData);
     }
 
-    private void startCraft(FabricatorRecipe recipe, FabricatorStateData stateData, TileEntityZoneInventory inputInventory) {
+    private void startCraft(FabricatorRecipe recipe, TileEntityZoneInventory inputInventory) {
         updateStateData(recipe);
         inputInventory.decreaseAllStacks();
         setChanged();
@@ -147,12 +146,11 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private void updateStateData(FabricatorRecipe newRecipe) {
         if (newRecipe == null) {
             fabricatorStateData.clean();
-            currentRecipeID = null;
+            currentRecipeID = new ResourceLocation("");
             return;
         }
 
-        //TODO read max time from recipe json
-        int maxTicksForRecipe = WORK_TIME;
+        int maxTicksForRecipe = newRecipe.getTime();
         currentRecipeID = newRecipe.getId();
         fabricatorStateData.set(0, 0);
         fabricatorStateData.set(1, maxTicksForRecipe);

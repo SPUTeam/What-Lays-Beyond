@@ -1,11 +1,12 @@
 {
   "type": "futurearmour:fabricating",
   "group": "futurearmour",
+  "time" : 40,
   "pattern": [
      "xx",
-     "   ",
-    "    ",
-     "   "
+     "xxx",
+    "xxxx",
+     "xxx"
   ],
   "key": {
     "x": {

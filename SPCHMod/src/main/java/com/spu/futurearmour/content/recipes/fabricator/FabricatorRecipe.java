@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
 import com.spu.futurearmour.setup.RecipeTypesRegistry;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
@@ -22,20 +21,35 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class FabricatorRecipe implements IFabricatorRecipe {
     private final ItemStack result;
+    private final int time;
     private final NonNullList<Ingredient> ingredients;
     private final ResourceLocation id;
     private final String group;
 
-    public FabricatorRecipe(ItemStack result, NonNullList<Ingredient> ingredients, ResourceLocation id, String group) {
+    public FabricatorRecipe(ItemStack result, NonNullList<Ingredient> ingredients, ResourceLocation id, String group, int time) {
         this.ingredients = ingredients;
         this.id = id;
         this.group = group;
         this.result = result;
+        this.time = time;
+        LOGGER.debug("--------------------------------------");
+        LOGGER.debug("Built recipe:" + result.toString());
+        for(int i =0; i < ingredients.size(); i ++){
+            Optional<ItemStack> first = Arrays.stream(ingredients.get(i).getItems()).findFirst();
+            if(first.isPresent()) {
+                LOGGER.debug(i + " " + first.get());
+            }else{
+                LOGGER.debug(i);
+            }
+        }
+        LOGGER.debug("--------------------------------------");
     }
 
     @Override
@@ -51,7 +65,7 @@ public class FabricatorRecipe implements IFabricatorRecipe {
 
     @Override
     public ItemStack assemble(FabricatorControllerTileEntity tileEntity) {
-        return this.result;
+        return this.result.copy();
     }
 
     @Override
@@ -72,6 +86,10 @@ public class FabricatorRecipe implements IFabricatorRecipe {
     @Override
     public IRecipeType<?> getType() {
         return Registry.RECIPE_TYPE.get(RECIPE_TYPE);
+    }
+
+    public int getTime() {
+        return time;
     }
 
     public static int getRowWidth(int row) {
@@ -99,7 +117,7 @@ public class FabricatorRecipe implements IFabricatorRecipe {
         Map<String, Ingredient> map = Maps.newHashMap();
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             if (entry.getKey().length() != 1) {
-                throw new JsonSyntaxException("Invalid key entry: '" + (String) entry.getKey() + "' is an invalid symbol (must be 1 character only).");
+                throw new JsonSyntaxException("Invalid key entry: '" + entry.getKey() + "' is an invalid symbol (must be 1 character only).");
             }
             if (" ".equals(entry.getKey())) {
                 throw new JsonSyntaxException("Invalid key entry: ' ' is a reserved symbol.");
@@ -141,9 +159,13 @@ public class FabricatorRecipe implements IFabricatorRecipe {
                 if (ingredient == null) {
                     throw new JsonSyntaxException("Pattern references symbol '" + key + "' but it's not defined in the key");
                 }
-
                 keys.remove(key);
-                result.set(ch + getRowWidth(row) * row, ingredient);
+
+                int resultIndex = ch;
+                for(int i = 0; i < row; i++){
+                    resultIndex += getRowWidth(i);
+                }
+                result.set(resultIndex, ingredient);
             }
         }
 
@@ -159,11 +181,12 @@ public class FabricatorRecipe implements IFabricatorRecipe {
         @Override
         public FabricatorRecipe fromJson(ResourceLocation id, JsonObject jsonObject) {
             String group = JSONUtils.getAsString(jsonObject, "group", "");
+            int time = JSONUtils.getAsInt(jsonObject, "time");
             Map<String, Ingredient> ingredientMap = keysFromJson(JSONUtils.getAsJsonObject(jsonObject, "key"));
             String[] pattern = patternFromJson(JSONUtils.getAsJsonArray(jsonObject, "pattern"));
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, ingredientMap);
             ItemStack result = ShapedRecipe.itemFromJson(JSONUtils.getAsJsonObject(jsonObject, "result"));
-            return new FabricatorRecipe(result, ingredients, id, group);
+            return new FabricatorRecipe(result, ingredients, id, group, time);
         }
 
         @Nullable
@@ -177,7 +200,10 @@ public class FabricatorRecipe implements IFabricatorRecipe {
             }
 
             ItemStack result = packetBuffer.readItem();
-            return new FabricatorRecipe(result, ingredients, id, group);
+
+            int time = packetBuffer.readInt();
+
+            return new FabricatorRecipe(result, ingredients, id, group, time);
         }
 
         @Override
@@ -189,6 +215,8 @@ public class FabricatorRecipe implements IFabricatorRecipe {
             }
 
             packetBuffer.writeItem(recipe.result);
+
+            packetBuffer.writeInt(recipe.time);
         }
     }
     //endregion

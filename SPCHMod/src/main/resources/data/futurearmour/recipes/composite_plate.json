@@ -1,0 +1,25 @@
+{
+  "type": "futurearmour:fabricating",
+  "group": "futurearmour",
+  "time" : 120,
+  "pattern": [
+     "  ",
+     "xxx",
+    "yyyy",
+     "zzz"
+  ],
+  "key": {
+    "x": {
+      "item": "futurearmour:carbon_fiber"
+    },
+    "y": {
+      "item": "futurearmour:glass_fiber"
+    },
+    "z": {
+      "item": "futurearmour:nylon_roll"
+    }
+  },
+  "result": {
+    "item": "futurearmour:composite_plate"
+  }
+}
