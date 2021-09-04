@@ -51,6 +51,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private TileEntityZoneInventory inputInventory;
     private TileEntityZoneInventory outputInventory;
     private final FabricatorStateData fabricatorStateData = new FabricatorStateData();
+    private ResourceLocation previousRecipeID = new ResourceLocation("");
     private ResourceLocation currentRecipeID = new ResourceLocation("");
     private boolean craftingIsOn = false;
 
@@ -107,6 +108,8 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         }
 
         proceedCraft(stateData);
+
+        previousRecipeID = currentRecipeID;
     }
 
     private void startCraft(FabricatorRecipe recipe, TileEntityZoneInventory inputInventory) {
@@ -124,11 +127,17 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         outputInventory.insertStack(recipe.getResultItem().copy());
         updateStateData(null);
         setChanged();
+
+        FabricatorRecipe nextRecipe = getCurrentRecipe();
+        if(nextRecipe == null || !previousRecipeID.toString().equals(nextRecipe.getId().toString())){
+            if(this.craftingIsOn)toggleCrafting(false);
+        }
     }
 
     private boolean canStartCraft(FabricatorRecipe recipe, TileEntityZoneInventory outputInventory) {
+        boolean buttonToggled = this.craftingIsOn;
         boolean enoughSpace = outputInventory.canFitStack(recipe.getResultItem());
-        return enoughSpace && this.craftingIsOn;
+        return enoughSpace && buttonToggled;
     }
 
     public void playerInteract(PlayerEntity player) {
@@ -316,6 +325,7 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     public CompoundNBT save(CompoundNBT nbt) {
         super.save(nbt);
         fabricatorStateData.saveToNBT(nbt);
+        nbt.putString("previous_recipe_id", previousRecipeID.toString());
         nbt.putString("current_recipe_id", currentRecipeID.toString());
         nbt.put("input_slots", inputInventory.serializeNBT());
         nbt.put("output_slots", outputInventory.serializeNBT());
@@ -328,6 +338,9 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         super.load(state, nbt);
 
         fabricatorStateData.loadFromNBT(nbt);
+
+        String previousRecipeIdString = nbt.getString("previous_recipe_id");
+        previousRecipeID = ResourceLocation.tryParse(previousRecipeIdString);
 
         String currentRecipeIdString = nbt.getString("current_recipe_id");
         currentRecipeID = ResourceLocation.tryParse(currentRecipeIdString);
