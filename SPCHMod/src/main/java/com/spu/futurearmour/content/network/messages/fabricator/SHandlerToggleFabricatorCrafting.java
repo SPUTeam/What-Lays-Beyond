@@ -50,12 +50,9 @@ public class SHandlerToggleFabricatorCrafting {
     private static void processOnServer(final CTSMessageToggleFabricatorCrafting message, ServerPlayerEntity sendingPlayer){
         ServerWorld world = sendingPlayer.getLevel();
         BlockPos fabricatorPos = new BlockPos(message.getFabricatorPosition());
-        LOGGER.debug("processed");
         if(!world.hasChunkAt(fabricatorPos))return;
-        LOGGER.debug("validated chunk");
         TileEntity entity = world.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
         if(entity instanceof FabricatorControllerTileEntity){
-            LOGGER.debug("found chuck");
             FabricatorControllerTileEntity fabricator = (FabricatorControllerTileEntity) entity;
             fabricator.toggleCrafting(message.getNextStateIsOn());
         }

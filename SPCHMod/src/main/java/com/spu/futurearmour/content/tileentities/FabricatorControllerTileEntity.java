@@ -127,7 +127,8 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     }
 
     private boolean canStartCraft(FabricatorRecipe recipe, TileEntityZoneInventory outputInventory) {
-        return outputInventory.canFitStack(recipe.getResultItem());
+        boolean enoughSpace = outputInventory.canFitStack(recipe.getResultItem());
+        return enoughSpace && this.craftingIsOn;
     }
 
     public void playerInteract(PlayerEntity player) {
@@ -144,13 +145,14 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     private void updateStateData(int craftTicksElapsed) {
         int maxTicksForCurrentRecipe = fabricatorStateData.get(1);
         //clamp 0,maxTicks (thanks java, very cool)
-        int validatedTicksLeft = craftTicksElapsed > maxTicksForCurrentRecipe ? maxTicksForCurrentRecipe : craftTicksElapsed < 0 ? 0 : craftTicksElapsed;
+        int validatedTicksLeft = craftTicksElapsed > maxTicksForCurrentRecipe ? maxTicksForCurrentRecipe : Math.max(craftTicksElapsed, 0);
         fabricatorStateData.set(0, validatedTicksLeft);
     }
 
     private void updateStateData(FabricatorRecipe newRecipe) {
         if (newRecipe == null) {
-            fabricatorStateData.clean();
+            fabricatorStateData.set(0,0);
+            fabricatorStateData.set(1,0);
             currentRecipeID = new ResourceLocation("");
             return;
         }
@@ -167,7 +169,6 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         this.craftingIsOn = nextState;
         int asInt = this.craftingIsOn ? 1 : 0;
         fabricatorStateData.set(2, asInt);
-        LOGGER.debug("On server toggled " + this.craftingIsOn);
     }
     //endregion
 

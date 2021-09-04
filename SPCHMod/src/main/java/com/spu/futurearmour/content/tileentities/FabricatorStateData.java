@@ -2,6 +2,8 @@ package com.spu.futurearmour.content.tileentities;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.IIntArray;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FabricatorStateData implements IIntArray {
     public int craftTimeElapsed;
@@ -82,11 +84,19 @@ public class FabricatorStateData implements IIntArray {
     public void saveToNBT(CompoundNBT nbt) {
         nbt.putInt("CraftTimeElapsed", craftTimeElapsed);
         nbt.putInt("CraftTimeForCompletion", craftTimeForCompletion);
+        nbt.putInt("CraftingIsOn", craftingIsOn);
+        nbt.putInt("FabricatorPosX", fabricatorPosX);
+        nbt.putInt("FabricatorPosY", fabricatorPosY);
+        nbt.putInt("FabricatorPosZ", fabricatorPosZ);
     }
 
     public void loadFromNBT(CompoundNBT nbt) {
         craftTimeElapsed = nbt.getInt("CraftTimeElapsed");
         craftTimeForCompletion = nbt.getInt("CraftTimeForCompletion");
+        craftingIsOn = nbt.getInt("CraftingIsOn");
+        fabricatorPosX = nbt.getInt("FabricatorPosX");
+        fabricatorPosY = nbt.getInt("FabricatorPosY");
+        fabricatorPosZ = nbt.getInt("FabricatorPosZ");
     }
 
     public void clean(){
@@ -94,4 +104,6 @@ public class FabricatorStateData implements IIntArray {
             set(i, 0);
         }
     }
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }
