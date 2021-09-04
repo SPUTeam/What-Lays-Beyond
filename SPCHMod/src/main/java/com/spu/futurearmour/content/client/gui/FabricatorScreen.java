@@ -43,6 +43,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
         this.renderTooltip(matrixStack, x, y);
+        this.updateCraftingButton();
     }
 
     @Override
@@ -58,19 +59,26 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         renderProgressArrowOverlay(matrixStack, PARTS_ONE_TEXTURE, menu.getProgressArrowScale());
     }
 
-    private void addCraftButton(){
+    private void addCraftButton() {
         Vector3i centerPos = centerPosForSize(44, 21);
-        int posX = centerPos.getX() + 101;
+        int posX = centerPos.getX() + 102;
         int posY = centerPos.getY() + 8;
-        addButton(new ImageButton(
-                posX,posY,
-                44,21,
-                0,175,24,
+        int xOffset = menu.getCraftingIsOn() ? 45 : 0;
+        addButton(new FabricatorCraftButton(
+                posX, posY,
+                44, 21,
+                xOffset, 175, 24,
                 PARTS_ONE_TEXTURE,
-                (button) ->{
-                    Networking.simpleChannel.sendToServer(new CTSMessageToggleFabricatorCrafting(new Vector3d(0,0,0), true));
+                (button) -> {
+                    FabricatorCraftButton craftButton = (FabricatorCraftButton) button;
+                    Networking.simpleChannel.sendToServer(new CTSMessageToggleFabricatorCrafting(menu.getFabricatorPosition(), !craftButton.getCraftingIsOn()));
                 }
         ));
+    }
+
+    private void updateCraftingButton(){
+        FabricatorCraftButton craftButton = (FabricatorCraftButton) this.buttons.get(0);
+        craftButton.updateCraftingState(menu.getCraftingIsOn());
     }
 
     private void renderProgressArrowOverlay(MatrixStack matrixStack, ResourceLocation texture, int heightToRender) {

@@ -1,15 +1,26 @@
 package com.spu.futurearmour.content.network.messages.fabricator;
 
+import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fml.loading.FMLClientLaunchProvider;
+import net.minecraftforge.fml.loading.FMLCommonLaunchHandler;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLServiceProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class SHandlerToggleFabricatorCrafting {
@@ -17,7 +28,6 @@ public class SHandlerToggleFabricatorCrafting {
         NetworkEvent.Context ctx = ctxSupplier.get();
         LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
         ctx.setPacketHandled(true);
-
         if(!message.isMessageValid())return;
 
         switch (sideReceived){
@@ -30,20 +40,25 @@ public class SHandlerToggleFabricatorCrafting {
                     LOGGER.warn("EntityPlayerMP was null when CTSMessageToggleFabricatorCrafting was received");
                 }
 
-                ctx.enqueueWork(() -> processOnServer(message, sendingPlayer));
+                ctx.enqueueWork(() ->
+                        processOnServer(message, sendingPlayer));
                 break;
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static void processOnServer(final CTSMessageToggleFabricatorCrafting message, ServerPlayerEntity sendingPlayer){
-        LOGGER.debug("Got message: " + message.getFabricatorPosition() + " | " + message.getNextStateIsOn());
-
-//        ServerWorld serverWorld = sendingPlayer.getLevel();
-//        TileEntity tileEntity = serverWorld.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
-//        if(tileEntity instanceof FabricatorControllerTileEntity){
-//            FabricatorControllerTileEntity fabricatorTileEntity = (FabricatorControllerTileEntity) tileEntity;
-//            fabricatorTileEntity.toggleCrafting(message.getNextStateIsOn());
-//        }
+        ServerWorld world = sendingPlayer.getLevel();
+        BlockPos fabricatorPos = new BlockPos(message.getFabricatorPosition());
+        LOGGER.debug("processed");
+        if(!world.hasChunkAt(fabricatorPos))return;
+        LOGGER.debug("validated chunk");
+        TileEntity entity = world.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
+        if(entity instanceof FabricatorControllerTileEntity){
+            LOGGER.debug("found chuck");
+            FabricatorControllerTileEntity fabricator = (FabricatorControllerTileEntity) entity;
+            fabricator.toggleCrafting(message.getNextStateIsOn());
+        }
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

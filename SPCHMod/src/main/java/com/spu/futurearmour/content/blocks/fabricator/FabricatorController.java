@@ -94,7 +94,7 @@ public class FabricatorController extends Block {
         return new FabricatorControllerTileEntity();
     }
 
-    private FabricatorControllerTileEntity getConnectedEntity(World world, BlockPos pos) {
+    public FabricatorControllerTileEntity getConnectedEntity(World world, BlockPos pos) {
         TileEntity entity = world.getBlockEntity(pos);
         if (entity instanceof FabricatorControllerTileEntity) {
             return (FabricatorControllerTileEntity) entity;

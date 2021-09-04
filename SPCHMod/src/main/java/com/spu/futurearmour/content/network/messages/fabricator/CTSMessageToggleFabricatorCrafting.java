@@ -2,15 +2,16 @@ package com.spu.futurearmour.content.network.messages.fabricator;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class CTSMessageToggleFabricatorCrafting {
     private boolean messageIsValid;
     private boolean nextStateIsOn;
-    private Vector3d fabricatorPosition;
+    private Vector3i fabricatorPosition;
 
-    public CTSMessageToggleFabricatorCrafting(Vector3d fabricatorPosition, boolean nextStateIsOn){
+    public CTSMessageToggleFabricatorCrafting(Vector3i fabricatorPosition, boolean nextStateIsOn){
         this.fabricatorPosition = fabricatorPosition;
         this.nextStateIsOn = nextStateIsOn;
         this.messageIsValid = true;
@@ -20,7 +21,7 @@ public class CTSMessageToggleFabricatorCrafting {
         messageIsValid = false;
     }
 
-    public Vector3d getFabricatorPosition(){
+    public Vector3i getFabricatorPosition(){
         return fabricatorPosition;
     }
 
@@ -32,10 +33,10 @@ public class CTSMessageToggleFabricatorCrafting {
         CTSMessageToggleFabricatorCrafting result = new CTSMessageToggleFabricatorCrafting();
         try {
             result.nextStateIsOn = buffer.readBoolean();
-            double x = buffer.readDouble();
-            double y = buffer.readDouble();
-            double z = buffer.readDouble();
-            result.fabricatorPosition = new Vector3d(x,z,y);
+            int x = buffer.readInt();
+            int y = buffer.readInt();
+            int z = buffer.readInt();
+            result.fabricatorPosition = new Vector3i(x,y,z);
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
             LOGGER.warn("Exception while reading AirStrikeMessageToServer: " + e);
             return result;
@@ -47,9 +48,9 @@ public class CTSMessageToggleFabricatorCrafting {
     public void encode(PacketBuffer buffer) {
         if (!messageIsValid) return;
         buffer.writeBoolean(nextStateIsOn);
-        buffer.writeDouble(fabricatorPosition.x);
-        buffer.writeDouble(fabricatorPosition.y);
-        buffer.writeDouble(fabricatorPosition.z);
+        buffer.writeInt(fabricatorPosition.getX());
+        buffer.writeInt(fabricatorPosition.getY());
+        buffer.writeInt(fabricatorPosition.getZ());
     }
 
     public boolean isMessageValid(){

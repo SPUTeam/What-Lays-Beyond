@@ -1,6 +1,6 @@
 package com.spu.futurearmour.content.containers;
 
-import com.spu.futurearmour.content.blocks.fabricator.FabricatorStateData;
+import com.spu.futurearmour.content.tileentities.FabricatorStateData;
 import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.content.tileentities.TileEntityZoneInventory;
 import com.spu.futurearmour.setup.ContainerTypeRegistry;
@@ -10,6 +10,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -110,6 +111,22 @@ public class FabricatorControllerContainer extends Container {
         int progressArrowHeight = 29;
         double progress = ((double) ticksElapsed / (double) ticksToFinish) * (double) progressArrowHeight;
         return (int) progress;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public boolean getCraftingIsOn(){
+        return fabricatorStateData.get(2) == 1;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public Vector3i getFabricatorPosition(){
+        int x = fabricatorStateData.get(3);
+        int y = fabricatorStateData.get(4);
+        int z = fabricatorStateData.get(5);
+
+        LOGGER.debug(fabricatorStateData.get(2));
+
+        return new Vector3i(x,y,z);
     }
 
     private static Logger LOGGER = LogManager.getLogger();

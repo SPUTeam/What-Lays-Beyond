@@ -3,9 +3,7 @@ package com.spu.futurearmour.content.tileentities;
 import com.ibm.icu.impl.IllegalIcuArgumentException;
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.blocks.fabricator.FabricatorController;
-import com.spu.futurearmour.content.blocks.fabricator.FabricatorStateData;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
-import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.setup.BlockRegistry;
 import com.spu.futurearmour.setup.ModBlockStateProperties;
@@ -29,7 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -80,9 +77,16 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         }
 
         if (this.level.isClientSide()) return;
+        updateFabricatorPosition();
 
         //crafting
         tickCrafting(currentRecipeID, fabricatorStateData);
+    }
+
+    private void updateFabricatorPosition(){
+        fabricatorStateData.set(3, getBlockPos().getX());
+        fabricatorStateData.set(4, getBlockPos().getY());
+        fabricatorStateData.set(5, getBlockPos().getZ());
     }
 
     //region Crafting
@@ -160,8 +164,10 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     public void toggleCrafting(boolean nextState){
         if (this.level.isClientSide()) return;
 
-        Vector3d vectorPosition = new Vector3d(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
-        CTSMessageToggleFabricatorCrafting message = new CTSMessageToggleFabricatorCrafting(vectorPosition, nextState);
+        this.craftingIsOn = nextState;
+        int asInt = this.craftingIsOn ? 1 : 0;
+        fabricatorStateData.set(2, asInt);
+        LOGGER.debug("On server toggled " + this.craftingIsOn);
     }
     //endregion
 
