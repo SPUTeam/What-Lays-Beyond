@@ -27,6 +27,8 @@ import javax.annotation.Nullable;
 public class FabricatorScreen extends ContainerScreen<FabricatorControllerContainer> {
     public static final ResourceLocation BG_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_bg.png");
     public static final ResourceLocation PARTS_ONE_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_one.png");
+    public static final ResourceLocation PARTS_TWO_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_two.png");
+
 
     public FabricatorScreen(FabricatorControllerContainer container, PlayerInventory playerInventory, ITextComponent defaultName) {
         super(container, playerInventory, new StringTextComponent(""));
@@ -52,6 +54,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
         this.inventoryLabelY = -300;
         renderScreenBackground(matrixStack, BG_TEXTURE);
+        renderLeftFrame(matrixStack, PARTS_TWO_TEXTURE);
         renderPlayerInventory(matrixStack, PARTS_ONE_TEXTURE);
         renderCraftingSlots(matrixStack, PARTS_ONE_TEXTURE);
         renderResultSlots(matrixStack, PARTS_ONE_TEXTURE);
@@ -59,6 +62,20 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         renderProgressArrowOverlay(matrixStack, PARTS_ONE_TEXTURE, menu.getProgressArrowScale());
     }
 
+    private void renderLeftFrame(MatrixStack matrixStack, ResourceLocation texture){
+        RenderSystem.color4f(1, 1, 1, 1);
+        minecraft.getTextureManager().bind(texture);
+        this.imageWidth = 179;
+        this.imageHeight = 107;
+
+        Vector3i centerPos = centerPosForSize(179, 107);
+        int posX = centerPos.getX() - 15;
+        int posY = centerPos.getY() - 48;
+
+        blit(matrixStack, posX, posY, 0, 0, 179, 107);
+    }
+
+    //region Crafting UI
     private void addCraftButton() {
         Vector3i centerPos = centerPosForSize(44, 21);
         int posX = centerPos.getX() + 102;
@@ -133,6 +150,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
         blit(matrixStack, posX, posY, 0, 81, 85, 75);
     }
+    //endregion
 
     private void renderPlayerInventory(MatrixStack matrixStack, ResourceLocation texture) {
         RenderSystem.color4f(1, 1, 1, 1);
