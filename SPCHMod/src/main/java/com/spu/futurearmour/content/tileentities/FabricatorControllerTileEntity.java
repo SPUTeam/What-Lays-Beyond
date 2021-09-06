@@ -64,6 +64,12 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        updateFabricatorPosition();
+    }
+
+    @Override
     public void tick() {
         if (this.getLevel() == null) return;
 
@@ -78,7 +84,6 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         }
 
         if (this.level.isClientSide()) return;
-        updateFabricatorPosition();
 
         //crafting
         tickCrafting(currentRecipeID, fabricatorStateData);

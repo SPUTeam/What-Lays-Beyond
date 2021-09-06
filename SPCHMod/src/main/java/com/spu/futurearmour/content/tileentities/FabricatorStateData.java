@@ -5,13 +5,18 @@ import net.minecraft.util.IIntArray;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.ByteBuffer;
+
 public class FabricatorStateData implements IIntArray {
     public int craftTimeElapsed;
     public int craftTimeForCompletion;
     public int craftingIsOn;
-    public int fabricatorPosX;
-    public int fabricatorPosY;
-    public int fabricatorPosZ;
+    public short fabricatorPosXLeft;
+    public short fabricatorPosXRight;
+    public short fabricatorPosYLeft;
+    public short fabricatorPosYRight;
+    public short fabricatorPosZLeft;
+    public short fabricatorPosZRight;
 
     private final int CRAFT_TIME_INDEX = 0;
     private final int CRAFT_TIME_FOR_COMPLETION_INDEX = 1;
@@ -20,6 +25,8 @@ public class FabricatorStateData implements IIntArray {
     private final int TE_POS_Y_INDEX = 4;
     private final int TE_POS_Z_INDEX = 5;
     private final int END_OF_DATA_INDEX_PLUS_ONE = 6;
+
+    private final ByteBuffer byteBuffer = ByteBuffer.allocate(4);
 
     @Override
     public int get(int index) {
@@ -32,11 +39,11 @@ public class FabricatorStateData implements IIntArray {
             case CRAFTING_IS_ON_INDEX:
                 return craftingIsOn;
             case TE_POS_X_INDEX:
-                return fabricatorPosX;
+                return shortsToInt(fabricatorPosXLeft, fabricatorPosXRight);
             case TE_POS_Y_INDEX:
-                return fabricatorPosY;
+                return shortsToInt(fabricatorPosYLeft, fabricatorPosYRight);
             case TE_POS_Z_INDEX:
-                return fabricatorPosZ;
+                return shortsToInt(fabricatorPosZLeft, fabricatorPosZRight);
             default:
                 return 0;
         }
@@ -59,13 +66,19 @@ public class FabricatorStateData implements IIntArray {
                 craftingIsOn = value;
                 break;
             case TE_POS_X_INDEX:
-                fabricatorPosX = value;
+                short[] shortsX = intToShortsArray(value);
+                fabricatorPosXLeft = shortsX[0];
+                fabricatorPosXRight = shortsX[1];
                 break;
             case TE_POS_Y_INDEX:
-                fabricatorPosY = value;
+                short[] shortsY = intToShortsArray(value);
+                fabricatorPosYLeft = shortsY[0];
+                fabricatorPosYRight = shortsY[1];
                 break;
             case TE_POS_Z_INDEX:
-                fabricatorPosZ = value;
+                short[] shortsZ = intToShortsArray(value);
+                fabricatorPosZLeft = shortsZ[0];
+                fabricatorPosZRight = shortsZ[1];
                 break;
         }
     }
@@ -85,24 +98,54 @@ public class FabricatorStateData implements IIntArray {
         nbt.putInt("CraftTimeElapsed", craftTimeElapsed);
         nbt.putInt("CraftTimeForCompletion", craftTimeForCompletion);
         nbt.putInt("CraftingIsOn", craftingIsOn);
-        nbt.putInt("FabricatorPosX", fabricatorPosX);
-        nbt.putInt("FabricatorPosY", fabricatorPosY);
-        nbt.putInt("FabricatorPosZ", fabricatorPosZ);
+        nbt.putShort("FabricatorPosXLeft", fabricatorPosXLeft);
+        nbt.putShort("FabricatorPosXRight", fabricatorPosXRight);
+        nbt.putShort("FabricatorPosYLeft", fabricatorPosYLeft);
+        nbt.putShort("FabricatorPosYRight", fabricatorPosYRight);
+        nbt.putShort("FabricatorPosZLeft", fabricatorPosZLeft);
+        nbt.putShort("FabricatorPosZRight", fabricatorPosZRight);
     }
 
     public void loadFromNBT(CompoundNBT nbt) {
         craftTimeElapsed = nbt.getInt("CraftTimeElapsed");
         craftTimeForCompletion = nbt.getInt("CraftTimeForCompletion");
         craftingIsOn = nbt.getInt("CraftingIsOn");
-        fabricatorPosX = nbt.getInt("FabricatorPosX");
-        fabricatorPosY = nbt.getInt("FabricatorPosY");
-        fabricatorPosZ = nbt.getInt("FabricatorPosZ");
+        fabricatorPosXLeft = nbt.getShort("FabricatorPosXLeft");
+        fabricatorPosXRight = nbt.getShort("FabricatorPosXRight");
+        fabricatorPosXLeft = nbt.getShort("FabricatorPosXLeft");
+        fabricatorPosXRight = nbt.getShort("FabricatorPosXRight");
+        fabricatorPosXLeft = nbt.getShort("FabricatorPosXLeft");
+        fabricatorPosXRight = nbt.getShort("FabricatorPosXRight");
     }
 
     public void clean(){
         for (int i =0; i < END_OF_DATA_INDEX_PLUS_ONE; i++){
             set(i, 0);
         }
+    }
+
+    private int shortsToInt(short left, short right){
+        int result = 0;
+
+        byteBuffer.clear();
+        byteBuffer.putShort(left);
+        byteBuffer.putShort(right);
+        byteBuffer.rewind();
+        result = byteBuffer.getInt();
+
+        return result;
+    }
+
+    private short[] intToShortsArray(int input){
+        short[] result = new short[2];
+
+        byteBuffer.clear();
+        byteBuffer.putInt(input);
+        byteBuffer.rewind();
+        result[0] = byteBuffer.getShort();
+        result[1] = byteBuffer.getShort();
+
+        return result;
     }
 
     private static final Logger LOGGER = LogManager.getLogger();
