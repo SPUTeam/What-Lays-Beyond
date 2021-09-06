@@ -7,28 +7,27 @@ import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
-
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
 public class FabricatorScreen extends ContainerScreen<FabricatorControllerContainer> {
-    public static final ResourceLocation BG_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_bg.png");
+    public static final ResourceLocation BG_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_bg_mac.png");
     public static final ResourceLocation PARTS_ONE_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_one.png");
     public static final ResourceLocation PARTS_TWO_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_two.png");
 
+    private FabricatorCraftButton craftButton;
+    private FabricatorPanelChangeButton panelChangeButton;
+
+    private FabricatorGuiPanel currentPanel = FabricatorGuiPanel.PREVIEW;
 
     public FabricatorScreen(FabricatorControllerContainer container, PlayerInventory playerInventory, ITextComponent defaultName) {
         super(container, playerInventory, new StringTextComponent(""));
@@ -37,7 +36,8 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     @Override
     protected void init() {
         super.init();
-        addCraftButton();
+        craftButton = addCraftButton();
+        panelChangeButton = addPanelChangeButton();
     }
 
     @Override
@@ -54,7 +54,6 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
         this.inventoryLabelY = -300;
         renderScreenBackground(matrixStack, BG_TEXTURE);
-        renderLeftFrame(matrixStack, PARTS_TWO_TEXTURE);
         renderPlayerInventory(matrixStack, PARTS_ONE_TEXTURE);
         renderCraftingSlots(matrixStack, PARTS_ONE_TEXTURE);
         renderResultSlots(matrixStack, PARTS_ONE_TEXTURE);
@@ -62,26 +61,43 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         renderProgressArrowOverlay(matrixStack, PARTS_ONE_TEXTURE, menu.getProgressArrowScale());
     }
 
-    private void renderLeftFrame(MatrixStack matrixStack, ResourceLocation texture){
-        RenderSystem.color4f(1, 1, 1, 1);
-        minecraft.getTextureManager().bind(texture);
-        this.imageWidth = 179;
-        this.imageHeight = 107;
-
-        Vector3i centerPos = centerPosForSize(179, 107);
-        int posX = centerPos.getX() - 15;
-        int posY = centerPos.getY() - 48;
-
-        blit(matrixStack, posX, posY, 0, 0, 179, 107);
+    //region Left Panels
+    private FabricatorPanelChangeButton addPanelChangeButton() {
+        Vector3i centerPos = centerPosForSize(67, 15);
+        int posX = centerPos.getX() - 113;
+        int posY = centerPos.getY() - 100;
+        return addButton(new FabricatorPanelChangeButton(
+                posX, posY,
+                65, 15,
+                0, 0,
+                PARTS_TWO_TEXTURE,
+                (button) -> {
+                    changeLeftPanel();
+                }
+        ));
     }
 
+    private void changeLeftPanel() {
+        switch (currentPanel) {
+            case PREVIEW:
+                currentPanel = FabricatorGuiPanel.RECIPES;
+                panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.RECIPES.buttonTexYOffset);
+                break;
+            case RECIPES:
+                currentPanel = FabricatorGuiPanel.PREVIEW;
+                panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.PREVIEW.buttonTexYOffset);
+                break;
+        }
+    }
+    //endregion
+
     //region Crafting UI
-    private void addCraftButton() {
+    private FabricatorCraftButton addCraftButton() {
         Vector3i centerPos = centerPosForSize(44, 21);
         int posX = centerPos.getX() + 102;
         int posY = centerPos.getY() + 8;
         int xOffset = menu.getCraftingIsOn() ? 45 : 0;
-        addButton(new FabricatorCraftButton(
+        return addButton(new FabricatorCraftButton(
                 posX, posY,
                 44, 21,
                 xOffset, 175, 24,
@@ -93,8 +109,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         ));
     }
 
-    private void updateCraftingButton(){
-        FabricatorCraftButton craftButton = (FabricatorCraftButton) this.buttons.get(0);
+    private void updateCraftingButton() {
         craftButton.updateCraftingState(menu.getCraftingIsOn());
     }
 
@@ -192,6 +207,17 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         int yPos = (this.height - ySize) / 2;
 
         return new Vector3i(xPos, yPos, 0);
+    }
+
+    private enum FabricatorGuiPanel {
+        PREVIEW(0),
+        RECIPES(16);
+
+        public final int buttonTexYOffset;
+
+        FabricatorGuiPanel(int buttonTexYOffset) {
+            this.buttonTexYOffset = buttonTexYOffset;
+        }
     }
 
     private static Logger LOGGER = LogManager.getLogger();

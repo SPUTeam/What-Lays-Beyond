@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class FabricatorCraftButton extends ImageButton {
 
-    private final ResourceLocation TEXTURE_LOCATION;
+    private final ResourceLocation textureLocation;
     private final int xTexStart;
     private final int yTexStart;
     private final int yDiff;
@@ -19,7 +19,7 @@ public class FabricatorCraftButton extends ImageButton {
     public FabricatorCraftButton(int p_i51134_1_, int p_i51134_2_, int p_i51134_3_, int p_i51134_4_, int xTexStart, int yTexStart, int yDiff, ResourceLocation textureLocation, IPressable onPress) {
         super(p_i51134_1_, p_i51134_2_, p_i51134_3_, p_i51134_4_, xTexStart, yTexStart, yDiff, textureLocation, onPress);
 
-        TEXTURE_LOCATION = textureLocation;
+        this.textureLocation = textureLocation;
         this.xTexStart = xTexStart;
         this.yTexStart = yTexStart;
         this.yDiff = yDiff;
@@ -36,7 +36,7 @@ public class FabricatorCraftButton extends ImageButton {
     @Override
     public void renderButton(MatrixStack p_230431_1_, int p_230431_2_, int p_230431_3_, float p_230431_4_) {
         Minecraft minecraft = Minecraft.getInstance();
-        minecraft.getTextureManager().bind(this.TEXTURE_LOCATION);
+        minecraft.getTextureManager().bind(this.textureLocation);
         int yTex = this.yTexStart;
         if (this.isHovered()) {
             yTex += this.yDiff;
