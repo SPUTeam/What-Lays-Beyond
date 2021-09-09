@@ -1,7 +1,7 @@
 package com.spu.futurearmour.setup;
 
 import com.spu.futurearmour.FutureArmour;
-import com.spu.futurearmour.content.client.gui.FabricatorScreen;
+import com.spu.futurearmour.content.client.gui.fabricator.FabricatorScreen;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.ContainerType;

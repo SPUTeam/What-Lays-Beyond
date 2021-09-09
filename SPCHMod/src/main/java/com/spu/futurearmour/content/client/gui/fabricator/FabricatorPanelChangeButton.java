@@ -1,4 +1,4 @@
-package com.spu.futurearmour.content.client.gui;
+package com.spu.futurearmour.content.client.gui.fabricator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;

@@ -1,12 +1,15 @@
-package com.spu.futurearmour.content.client.gui;
+package com.spu.futurearmour.content.client.gui.fabricator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.spu.futurearmour.FutureArmour;
+import com.spu.futurearmour.content.client.gui.common.AbstractSlider;
+import com.spu.futurearmour.content.client.gui.common.HorizontalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3i;
@@ -17,6 +20,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
+
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
 public class FabricatorScreen extends ContainerScreen<FabricatorControllerContainer> {
@@ -26,6 +31,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
     private FabricatorCraftButton craftButton;
     private FabricatorPanelChangeButton panelChangeButton;
+    private AbstractSlider previewModelSlider;
 
     private FabricatorGuiPanel currentPanel = FabricatorGuiPanel.PREVIEW;
 
@@ -38,12 +44,19 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         super.init();
         craftButton = addCraftButton();
         panelChangeButton = addPanelChangeButton();
+        previewModelSlider = addPreviewModelSlider();
     }
 
     @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
+        for(int i = 0; i < children().size(); i++){
+            if(!(children.get(i) instanceof Button)){
+                Widget widget = (Widget) children.get(i);
+                widget.render(matrixStack, x, y, partialTicks);
+            }
+        }
         this.renderTooltip(matrixStack, x, y);
         this.updateCraftingButton();
     }
@@ -62,6 +75,14 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     }
 
     //region Left Panels
+    private AbstractSlider addPreviewModelSlider(){
+        Vector3i centerPos = centerPosForSize(62, 3);
+        int posX = (centerPos.getX() - 5);
+        int posY = (centerPos.getY() + 5);
+
+        return this.addWidget(new HorizontalSlider(posX, posY));
+    }
+
     private FabricatorPanelChangeButton addPanelChangeButton() {
         Vector3i centerPos = centerPosForSize(67, 15);
         int posX = centerPos.getX() - 113;
