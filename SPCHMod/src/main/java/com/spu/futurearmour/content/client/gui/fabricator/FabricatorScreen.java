@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.client.gui.common.AbstractSlider;
 import com.spu.futurearmour.content.client.gui.common.HorizontalSlider;
+import com.spu.futurearmour.content.client.gui.common.VerticalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;

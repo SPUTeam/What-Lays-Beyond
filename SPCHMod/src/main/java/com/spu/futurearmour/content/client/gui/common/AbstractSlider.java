@@ -68,7 +68,9 @@ public class AbstractSlider extends Widget {
 
     @Override
     public void onClick(double x, double y) {
+        if (!isHovered) return;
         isDragging = true;
+        updateSliderValue((int) x, (int) y);
     }
 
     protected void updateSliderValue(int mouseX, int mouseY){

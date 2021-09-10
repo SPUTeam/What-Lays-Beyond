@@ -31,14 +31,6 @@ public class HorizontalSlider extends AbstractSlider {
     }
 
     @Override
-    public void onClick(double x, double y) {
-        super.onClick(x, y);
-        if (!isHovered) return;
-
-        updateSliderValue((int) x, (int) y);
-    }
-
-    @Override
     protected void updateSliderValue(int mouseX, int mouseY) {
         int offset = xPos - mouseX;
         float ratio = (float) offset / (float) width;
