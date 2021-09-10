@@ -1,23 +1,37 @@
 package com.spu.futurearmour.content.client.gui.fabricator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.client.gui.common.AbstractSlider;
 import com.spu.futurearmour.content.client.gui.common.HorizontalSlider;
-import com.spu.futurearmour.content.client.gui.common.VerticalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
+import com.spu.futurearmour.setup.ItemRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.SeparatePerspectiveModel;
+import net.minecraftforge.common.Tags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,6 +71,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
+        this.renderItemStackWithRotation(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
         super.render(matrixStack, x, y, partialTicks);
         for(int i = 0; i < children().size(); i++){
             if(!(children.get(i) instanceof Button)){
@@ -82,6 +97,46 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     }
 
     //region Left Panels
+    private void renderItemStackWithRotation(ItemStack stack, float rotation01){
+        IBakedModel bakedModel = itemRenderer.getModel(stack, null, null);
+        RenderSystem.pushMatrix();
+
+        Vector3i centerPos = centerPosForSize(150, 150);
+        int x = (centerPos.getX() + 17);
+        int y = (centerPos.getY() + 58);
+
+        Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
+        Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(false, false);
+        RenderSystem.enableRescaleNormal();
+        RenderSystem.enableAlphaTest();
+        RenderSystem.defaultAlphaFunc();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.translatef((float)x, (float)y, 150.0F);
+        RenderSystem.scalef(1.0F, -1.0F, 1.0F);
+        RenderSystem.scalef(192.0F, 192.0F, 1.0F);
+        RenderSystem.rotatef((250 * rotation01) - 25, 0, 1, 0);
+
+        MatrixStack matrixstack = new MatrixStack();
+        IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
+        boolean doesntUseBlockLight = !bakedModel.usesBlockLight();
+        if (doesntUseBlockLight) {
+            RenderHelper.setupForFlatItems();
+        }
+
+        itemRenderer.render(stack, ItemCameraTransforms.TransformType.GROUND, false, matrixstack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedModel);
+        irendertypebuffer$impl.endBatch();
+        RenderSystem.enableDepthTest();
+        if (doesntUseBlockLight) {
+            RenderHelper.setupFor3DItems();
+        }
+
+        RenderSystem.disableAlphaTest();
+        RenderSystem.disableRescaleNormal();
+        RenderSystem.popMatrix();
+    }
+
     private AbstractSlider addPreviewModelSlider(){
         Vector3i centerPos = centerPosForSize(62, 3);
         int posX = (centerPos.getX() - 90);

@@ -18,7 +18,7 @@ public class AbstractSlider extends Widget {
     protected boolean isDragging = false;
 
     private boolean wasHovered = false;
-    private float sliderValue = 0.5f;
+    private float sliderValue = 0.0F;
 
     public AbstractSlider(int xPos, int yPos, int width, int height) {
         super(xPos, yPos, width, height, StringTextComponent.EMPTY);
@@ -52,7 +52,7 @@ public class AbstractSlider extends Widget {
     }
 
     private boolean isHovered(int x, int y, boolean withMargin) {
-        int margin = withMargin ? 10 : 0;
+        int margin = withMargin ? 16 : 0;
         return x >= this.x - margin && y >= this.y - margin &&
                 x < this.x + this.width + margin && y < this.y + this.height + margin;
     }
