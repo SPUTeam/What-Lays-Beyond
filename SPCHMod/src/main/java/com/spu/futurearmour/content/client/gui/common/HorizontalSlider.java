@@ -4,14 +4,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 
-public class HorizontalSlider extends AbstractSlider{
+public class HorizontalSlider extends AbstractSlider {
     public HorizontalSlider(int xPos, int yPos) {
         super(xPos, yPos, 62, 5);
-    }
-
-    @Override
-    protected void onDrag(double p_230983_1_, double p_230983_3_, double p_230983_5_, double p_230983_7_) {
-        LOGGER.debug(p_230983_1_ + " | " + p_230983_3_);
     }
 
     @SuppressWarnings("deprecation")
@@ -36,12 +31,17 @@ public class HorizontalSlider extends AbstractSlider{
     }
 
     @Override
-    public void onClick(double p_230982_1_, double p_230982_3_) {
-        LOGGER.debug("KEK");
+    public void onClick(double x, double y) {
+        super.onClick(x, y);
+        if (!isHovered) return;
+
+        updateSliderValue((int) x, (int) y);
     }
 
     @Override
-    public void onRelease(double p_231000_1_, double p_231000_3_) {
-        LOGGER.debug("LOL");
+    protected void updateSliderValue(int mouseX, int mouseY) {
+        int offset = xPos - mouseX;
+        float ratio = (float) offset / (float) width;
+        setSliderValue(ratio * -1f);
     }
 }

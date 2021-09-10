@@ -48,6 +48,12 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     }
 
     @Override
+    public void tick() {
+        super.tick();
+
+    }
+
+    @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
@@ -77,8 +83,8 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     //region Left Panels
     private AbstractSlider addPreviewModelSlider(){
         Vector3i centerPos = centerPosForSize(62, 3);
-        int posX = (centerPos.getX() - 5);
-        int posY = (centerPos.getY() + 5);
+        int posX = (centerPos.getX() - 90);
+        int posY = (centerPos.getY() + 7);
 
         return this.addWidget(new HorizontalSlider(posX, posY));
     }
