@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.client.gui.common.AbstractSlider;
 import com.spu.futurearmour.content.client.gui.common.HorizontalSlider;
+import com.spu.futurearmour.content.client.gui.common.VerticalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
@@ -19,6 +20,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -40,13 +42,14 @@ import java.awt.*;
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
 public class FabricatorScreen extends ContainerScreen<FabricatorControllerContainer> {
-    public static final ResourceLocation BG_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_bg_mac.png");
+    public static final ResourceLocation BG_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_bg.png");
     public static final ResourceLocation PARTS_ONE_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_one.png");
     public static final ResourceLocation PARTS_TWO_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_two.png");
 
     private FabricatorCraftButton craftButton;
     private FabricatorPanelChangeButton panelChangeButton;
     private AbstractSlider previewModelSlider;
+    private AbstractSlider recipesSlider;
 
     private FabricatorGuiPanel currentPanel = FabricatorGuiPanel.PREVIEW;
 
@@ -60,6 +63,8 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         craftButton = addCraftButton();
         panelChangeButton = addPanelChangeButton();
         previewModelSlider = addPreviewModelSlider();
+        recipesSlider = addRecipesSlider();
+        changeLeftPanel();
     }
 
     @Override
@@ -71,12 +76,13 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
-        this.renderItemStackWithRotation(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
+        if(currentPanel == FabricatorGuiPanel.PREVIEW)this.renderItemStackWithRotation(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
+        if(currentPanel == FabricatorGuiPanel.RECIPES)this.renderRecipes(recipesSlider.getSliderValue());
         super.render(matrixStack, x, y, partialTicks);
         for(int i = 0; i < children().size(); i++){
             if(!(children.get(i) instanceof Button)){
                 Widget widget = (Widget) children.get(i);
-                widget.render(matrixStack, x, y, partialTicks);
+                if(widget.visible)widget.render(matrixStack, x, y, partialTicks);
             }
         }
         this.renderTooltip(matrixStack, x, y);
@@ -97,6 +103,23 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     }
 
     //region Left Panels
+    private void renderRecipes(float sliderValue){
+        int ySpaceLeft = 50;
+
+    }
+
+    private void renderRecipeItem(int yPos, int yToRender, boolean renderFromTop){
+
+    }
+
+    private AbstractSlider addRecipesSlider(){
+        Vector3i centerPos = centerPosForSize(3, 62);
+        int posX = (centerPos.getX() + 20);
+        int posY = (centerPos.getY() - 38);
+
+        return this.addWidget(new VerticalSlider(posX, posY));
+    }
+
     private void renderItemStackWithRotation(ItemStack stack, float rotation01){
         IBakedModel bakedModel = itemRenderer.getModel(stack, null, null);
         RenderSystem.pushMatrix();
@@ -139,7 +162,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
     private AbstractSlider addPreviewModelSlider(){
         Vector3i centerPos = centerPosForSize(62, 3);
-        int posX = (centerPos.getX() - 90);
+        int posX = (centerPos.getX() - 98);
         int posY = (centerPos.getY() + 7);
 
         return this.addWidget(new HorizontalSlider(posX, posY));
@@ -165,10 +188,14 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
             case PREVIEW:
                 currentPanel = FabricatorGuiPanel.RECIPES;
                 panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.RECIPES.buttonTexYOffset);
+                previewModelSlider.visible = false;
+                recipesSlider.visible = true;
                 break;
             case RECIPES:
                 currentPanel = FabricatorGuiPanel.PREVIEW;
                 panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.PREVIEW.buttonTexYOffset);
+                previewModelSlider.visible = true;
+                recipesSlider.visible = false;
                 break;
         }
     }
