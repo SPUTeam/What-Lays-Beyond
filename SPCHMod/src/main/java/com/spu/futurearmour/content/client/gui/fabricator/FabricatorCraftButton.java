@@ -47,11 +47,12 @@ public class FabricatorCraftButton extends ImageButton {
             xTex += 45;
         }
 
+        RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         blit(p_230431_1_, this.x, this.y, (float)xTex, (float)yTex, this.width, this.height, 256, 256);
         if (this.isHovered()) {
             this.renderToolTip(p_230431_1_, p_230431_2_, p_230431_3_);
         }
-
+        RenderSystem.disableBlend();
     }
 }
