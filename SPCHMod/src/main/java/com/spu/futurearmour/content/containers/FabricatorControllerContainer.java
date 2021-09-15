@@ -129,5 +129,10 @@ public class FabricatorControllerContainer extends Container {
         return new Vector3i(x,y,z);
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public World getWorld(){
+        return world;
+    }
+
     private static Logger LOGGER = LogManager.getLogger();
 }

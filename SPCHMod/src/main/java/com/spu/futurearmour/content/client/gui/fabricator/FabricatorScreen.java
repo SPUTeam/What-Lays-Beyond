@@ -10,7 +10,10 @@ import com.spu.futurearmour.content.client.gui.common.VerticalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
+import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.setup.ItemRegistry;
+import com.spu.futurearmour.setup.RecipeTypesRegistry;
+import com.sun.jna.platform.unix.X11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.Widget;
@@ -20,23 +23,21 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.SeparatePerspectiveModel;
-import net.minecraftforge.common.Tags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jline.utils.Display;
 
+import javax.swing.*;
 import java.awt.*;
 
 @SuppressWarnings("deprecation")
@@ -46,12 +47,12 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     public static final ResourceLocation PARTS_ONE_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_one.png");
     public static final ResourceLocation PARTS_TWO_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_two.png");
 
+    private RecipeManager recipeManager;
     private FabricatorCraftButton craftButton;
-    private FabricatorPanelChangeButton panelChangeButton;
+    private FabricatorTabChangeButton panelChangeButton;
     private AbstractSlider previewModelSlider;
     private AbstractSlider recipesSlider;
-
-    private FabricatorGuiPanel currentPanel = FabricatorGuiPanel.PREVIEW;
+    private FabricatorGuiTab currentTab = FabricatorGuiTab.PREVIEW;
 
     public FabricatorScreen(FabricatorControllerContainer container, PlayerInventory playerInventory, ITextComponent defaultName) {
         super(container, playerInventory, new StringTextComponent(""));
@@ -59,12 +60,13 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
     @Override
     protected void init() {
+        recipeManager = menu.getWorld().getRecipeManager();
         super.init();
         craftButton = addCraftButton();
-        panelChangeButton = addPanelChangeButton();
+        panelChangeButton = addTabChangeButton();
         previewModelSlider = addPreviewModelSlider();
         recipesSlider = addRecipesSlider();
-        changeLeftPanel();
+        changeLeftTab();
     }
 
     @Override
@@ -76,15 +78,17 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
-        if(currentPanel == FabricatorGuiPanel.PREVIEW)this.renderItemStackWithRotation(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
-        if(currentPanel == FabricatorGuiPanel.RECIPES)this.renderRecipes(recipesSlider.getSliderValue());
         super.render(matrixStack, x, y, partialTicks);
-        for(int i = 0; i < children().size(); i++){
-            if(!(children.get(i) instanceof Button)){
+        for (int i = 0; i < children().size(); i++) {
+            if (!(children.get(i) instanceof Button)) {
                 Widget widget = (Widget) children.get(i);
-                if(widget.visible)widget.render(matrixStack, x, y, partialTicks);
+                if (widget.visible) widget.render(matrixStack, x, y, partialTicks);
             }
         }
+        if (currentTab == FabricatorGuiTab.PREVIEW)
+            this.renderItemStackForPreview(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
+        if (currentTab == FabricatorGuiTab.RECIPES)
+            this.renderRecipes(matrixStack, recipesSlider.getSliderValue());
         this.renderTooltip(matrixStack, x, y);
         this.updateCraftingButton();
     }
@@ -102,25 +106,43 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         renderProgressArrowOverlay(matrixStack, PARTS_ONE_TEXTURE, menu.getProgressArrowScale());
     }
 
-    //region Left Panels
-    private void renderRecipes(float sliderValue){
-        int ySpaceLeft = 50;
+    //region Left Tabs
 
+    //region RecipeTab
+    private void renderRecipes(MatrixStack matrixStack, float sliderValue) {
+        Vector3i centerPos = centerPosForSize(152, 28);
+        int windowHeight = minecraft.getWindow().getHeight();
+        int windowWidth = minecraft.getWindow().getWidth();
+        RenderSystem.enableScissor(0, (int)(((float)windowHeight/2.15F)),
+                windowWidth, windowHeight);
+        for (int i = 0; i < 8; i++) {
+            int yPos = (centerPos.getY() - 75) + (i * 29);
+            renderRecipeItem(matrixStack, yPos, recipeManager.getAllRecipesFor(RecipeTypesRegistry.FABRICATING_RECIPE).get(0));
+
+        }
+        RenderSystem.disableScissor();
     }
 
-    private void renderRecipeItem(int yPos, int yToRender, boolean renderFromTop){
+    private void renderRecipeItem(MatrixStack matrixStack, int yPos, FabricatorRecipe recipe) {
+        RenderSystem.color4f(1, 1, 1, 1);
+        minecraft.getTextureManager().bind(PARTS_TWO_TEXTURE);
+        Vector3i centerPos = centerPosForSize(151, 28);
+        int xPos = centerPos.getX() - 62;
 
+        blit(matrixStack, xPos, yPos, 83, 0, 151, 28, 256, 256);
     }
 
-    private AbstractSlider addRecipesSlider(){
+    private AbstractSlider addRecipesSlider() {
         Vector3i centerPos = centerPosForSize(3, 62);
         int posX = (centerPos.getX() + 20);
         int posY = (centerPos.getY() - 38);
 
         return this.addWidget(new VerticalSlider(posX, posY));
     }
+    //endregion
 
-    private void renderItemStackWithRotation(ItemStack stack, float rotation01){
+    //region PreviewTab
+    private void renderItemStackForPreview(ItemStack stack, float rotation01) {
         IBakedModel bakedModel = itemRenderer.getModel(stack, null, null);
         RenderSystem.pushMatrix();
 
@@ -136,7 +158,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.translatef((float)x, (float)y, 150.0F);
+        RenderSystem.translatef((float) x, (float) y, 150.0F);
         RenderSystem.scalef(1.0F, -1.0F, 1.0F);
         RenderSystem.scalef(192.0F, 192.0F, 1.0F);
         RenderSystem.rotatef((250 * rotation01) - 25, 0, 1, 0);
@@ -160,7 +182,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         RenderSystem.popMatrix();
     }
 
-    private AbstractSlider addPreviewModelSlider(){
+    private AbstractSlider addPreviewModelSlider() {
         Vector3i centerPos = centerPosForSize(62, 3);
         int posX = (centerPos.getX() - 98);
         int posY = (centerPos.getY() + 7);
@@ -168,32 +190,33 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         return this.addWidget(new HorizontalSlider(posX, posY));
     }
 
-    private FabricatorPanelChangeButton addPanelChangeButton() {
+    private FabricatorTabChangeButton addTabChangeButton() {
         Vector3i centerPos = centerPosForSize(67, 15);
         int posX = centerPos.getX() - 113;
         int posY = centerPos.getY() - 100;
-        return addButton(new FabricatorPanelChangeButton(
+        return addButton(new FabricatorTabChangeButton(
                 posX, posY,
                 65, 15,
                 0, 0,
                 PARTS_TWO_TEXTURE,
                 (button) -> {
-                    changeLeftPanel();
+                    changeLeftTab();
                 }
         ));
     }
+    //endregion
 
-    private void changeLeftPanel() {
-        switch (currentPanel) {
+    private void changeLeftTab() {
+        switch (currentTab) {
             case PREVIEW:
-                currentPanel = FabricatorGuiPanel.RECIPES;
-                panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.RECIPES.buttonTexYOffset);
+                currentTab = FabricatorGuiTab.RECIPES;
+                panelChangeButton.setNextTexYOffset(FabricatorGuiTab.RECIPES.buttonTexYOffset);
                 previewModelSlider.visible = false;
                 recipesSlider.visible = true;
                 break;
             case RECIPES:
-                currentPanel = FabricatorGuiPanel.PREVIEW;
-                panelChangeButton.setNextTexYOffset(FabricatorGuiPanel.PREVIEW.buttonTexYOffset);
+                currentTab = FabricatorGuiTab.PREVIEW;
+                panelChangeButton.setNextTexYOffset(FabricatorGuiTab.PREVIEW.buttonTexYOffset);
                 previewModelSlider.visible = true;
                 recipesSlider.visible = false;
                 break;
@@ -319,13 +342,13 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         return new Vector3i(xPos, yPos, 0);
     }
 
-    private enum FabricatorGuiPanel {
+    private enum FabricatorGuiTab {
         PREVIEW(0),
         RECIPES(16);
 
         public final int buttonTexYOffset;
 
-        FabricatorGuiPanel(int buttonTexYOffset) {
+        FabricatorGuiTab(int buttonTexYOffset) {
             this.buttonTexYOffset = buttonTexYOffset;
         }
     }

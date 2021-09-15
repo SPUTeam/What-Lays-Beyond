@@ -6,14 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.util.ResourceLocation;
 
-public class FabricatorPanelChangeButton extends ImageButton {
+public class FabricatorTabChangeButton extends ImageButton {
     private final ResourceLocation textureLocation;
     private final int xTexStart;
     private final int yTexStart;
 
     private int texYOffset;
 
-    public FabricatorPanelChangeButton(int posX, int posY, int texSizeX, int texSizeY, int texStartX, int texStartY, ResourceLocation textureLocation, IPressable onPressedLambda) {
+    public FabricatorTabChangeButton(int posX, int posY, int texSizeX, int texSizeY, int texStartX, int texStartY, ResourceLocation textureLocation, IPressable onPressedLambda) {
         super(posX, posY, texSizeX, texSizeY, texStartX, texStartY, 0, textureLocation, onPressedLambda);
         this.textureLocation = textureLocation;
         this.xTexStart = texStartX;
