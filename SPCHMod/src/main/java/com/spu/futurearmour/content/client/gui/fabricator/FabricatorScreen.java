@@ -121,19 +121,25 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         int negativeYOffset = globalYOffset % 29;
 
         Vector3i centerPos = centerPosForSize(152, 28);
-        int windowHeight = minecraft.getWindow().getHeight();
-        int windowWidth = minecraft.getWindow().getWidth();
-        double scale = minecraft.getWindow().getGuiScale();
-        RenderSystem.enableScissor(0, (int) ((float) windowHeight / 2.15F),
-                windowWidth, (int) ((float) windowHeight / 2.45F));
+        int scaledHeight = minecraft.getWindow().getGuiScaledHeight();
+        int scale = (int) minecraft.getWindow().getGuiScale();
+        int scissorBoxBottomYPixel = (int)((((double)scaledHeight/2) - 9) * scale);
+        int scissorBoxTopYPixel = (int)((double)98 * scale);
+        RenderSystem.enableScissor(0, scissorBoxBottomYPixel,
+                minecraft.getWindow().getWidth(), scissorBoxTopYPixel);
+
         for (int i = 0; i < 8; i++) {
             if (firstIndexToRender + i >= fabricatorRecipes.size()) continue;
             int yPos = (centerPos.getY() - 75) + (i * 29) - negativeYOffset;
             FabricatorRecipe recipeToRender = fabricatorRecipes.get(firstIndexToRender + i);
             renderRecipeItem(matrixStack, yPos, recipeToRender);
         }
+
         RenderSystem.disableScissor();
     }
+
+//            RenderSystem.enableScissor(0, (int) ((float) pixelHeight / 2.15F),
+//            minecraft.getWindow().getWidth(), (int) ((float) pixelHeight / 2.45F));
 
     private void renderRecipeItem(MatrixStack matrixStack, int yPos, FabricatorRecipe recipe) {
         RenderSystem.color4f(1, 1, 1, 1);
