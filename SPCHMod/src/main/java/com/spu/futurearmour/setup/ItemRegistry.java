@@ -4,6 +4,8 @@ import com.spu.futurearmour.FutureArmour;
 import com.spu.futurearmour.content.items.armour.PilotSuitChestplate;
 import com.spu.futurearmour.content.items.armour.PilotSuiteLeggings;
 import com.spu.futurearmour.content.items.resources.*;
+import com.spu.futurearmour.content.items.tools.DiamondUpgradedSteelPickaxe;
+import com.spu.futurearmour.content.items.tools.SteelPickaxe;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
@@ -49,6 +51,10 @@ public class ItemRegistry {
     public static final RegistryObject<Item> ALUMINIUM_INGOT =
             ITEMS.register("aluminium_ingot", AluminiumIngot::new);
 
+    public static final RegistryObject<Item> STEEL_PICKAXE =
+            ITEMS.register("steel_pickaxe", SteelPickaxe::new);
+    public static final RegistryObject<Item> DIAMOND_UPGRADED_STEEL_PICKAXE =
+            ITEMS.register("diamond_upgraded_steel_pickaxe", DiamondUpgradedSteelPickaxe::new);
 
     public static final RegistryObject<Item> PILOT_SUIT_CHESTPLATE =
             ITEMS.register("pilot_suit_chestplate", PilotSuitChestplate::new);

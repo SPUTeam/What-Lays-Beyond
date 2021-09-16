@@ -123,8 +123,9 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         Vector3i centerPos = centerPosForSize(152, 28);
         int windowHeight = minecraft.getWindow().getHeight();
         int windowWidth = minecraft.getWindow().getWidth();
+        double scale = minecraft.getWindow().getGuiScale();
         RenderSystem.enableScissor(0, (int) ((float) windowHeight / 2.15F),
-                windowWidth, (int) ((float) windowHeight / 2.42F));
+                windowWidth, (int) ((float) windowHeight / 2.45F));
         for (int i = 0; i < 8; i++) {
             if (firstIndexToRender + i >= fabricatorRecipes.size()) continue;
             int yPos = (centerPos.getY() - 75) + (i * 29) - negativeYOffset;

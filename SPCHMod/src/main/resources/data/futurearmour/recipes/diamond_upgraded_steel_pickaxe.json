@@ -1,0 +1,23 @@
+{
+  "type": "futurearmour:fabricating",
+  "group": "futurearmour",
+  "time" : 90,
+  "pattern": [
+     "  ",
+     "dpd",
+    "    ",
+     "   "
+  ],
+  "key": {
+    "d": {
+      "item": "minecraft:diamond"
+    },
+    "p": {
+      "item": "futurearmour:steel_pickaxe"
+    }
+  },
+  "result": {
+    "item": "futurearmour:diamond_upgraded_steel_pickaxe",
+    "count": 1
+  }
+}

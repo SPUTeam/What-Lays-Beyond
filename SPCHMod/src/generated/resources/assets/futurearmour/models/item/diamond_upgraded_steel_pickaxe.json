@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "futurearmour:item/diamond_upgraded_steel_pickaxe"
+  }
+}

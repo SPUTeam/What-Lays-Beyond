@@ -33,5 +33,8 @@
   "block.futurearmour.uraniumsteel_block" : "Uraniumsteel Block",
 
   "item.futurearmour.pilot_suit_chestplate": "Pilot Suit Top",
-  "item.futurearmour.pilot_suit_leggings": "Pilot Suit Bottom"
+  "item.futurearmour.pilot_suit_leggings": "Pilot Suit Bottom",
+
+  "item.futurearmour.steel_pickaxe": "Steel Pickaxe",
+  "item.futurearmour.diamond_upgraded_steel_pickaxe": "Sharpened Steel Pickaxe"
 }

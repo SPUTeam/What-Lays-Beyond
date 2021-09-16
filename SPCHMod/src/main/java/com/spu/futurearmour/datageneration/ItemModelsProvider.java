@@ -1,7 +1,9 @@
 package com.spu.futurearmour.datageneration;
 
 import com.spu.futurearmour.FutureArmour;
+import com.spu.futurearmour.setup.ItemRegistry;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -14,27 +16,34 @@ public class ItemModelsProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-//        withExistingParent("fabricator_part_block", modLoc("block/fabricator_part_block"));
-//        withExistingParent("fabricator_controller_block", modLoc("block/fabricator_controller_block"));
+        forTool("steel_pickaxe");
+        forTool("diamond_upgraded_steel_pickaxe");
 
-        ModelFile itemGenerated = getExistingFile(mcLoc("item/generated"));
-        getBuilder(itemGenerated, "plastic_sheet");
-        getBuilder(itemGenerated, "nylon_roll");
-        getBuilder(itemGenerated, "carbon_fiber");
-        getBuilder(itemGenerated, "glass_fiber");
-        getBuilder(itemGenerated, "rubber_piece");
-        getBuilder(itemGenerated, "composite_plate");
-        getBuilder(itemGenerated, "copper_ingot");
-        getBuilder(itemGenerated, "magnesium_powder");
-        getBuilder(itemGenerated, "saltpeter_powder");
-        getBuilder(itemGenerated, "sulfur_powder");
-        getBuilder(itemGenerated, "steel_ingot");
-        getBuilder(itemGenerated, "titanium_ingot");
-        getBuilder(itemGenerated, "uranium_ingot");
-        getBuilder(itemGenerated, "uraniumsteel_ingot");
-        getBuilder(itemGenerated, "aluminium_ingot");
-        getBuilder(itemGenerated, "pilot_suit_chestplate");
-        getBuilder(itemGenerated, "pilot_suit_leggings");
+        forItem("plastic_sheet");
+        forItem("nylon_roll");
+        forItem("carbon_fiber");
+        forItem("glass_fiber");
+        forItem("rubber_piece");
+        forItem("composite_plate");
+        forItem("copper_ingot");
+        forItem("magnesium_powder");
+        forItem("saltpeter_powder");
+        forItem("sulfur_powder");
+        forItem("steel_ingot");
+        forItem("titanium_ingot");
+        forItem("uranium_ingot");
+        forItem("uraniumsteel_ingot");
+        forItem("aluminium_ingot");
+        forItem("pilot_suit_chestplate");
+        forItem("pilot_suit_leggings");
+    }
+
+    private ItemModelBuilder forTool(String name) {
+        return getBuilder(getExistingFile(mcLoc("item/handheld")), name);
+    }
+
+    private ItemModelBuilder forItem(String name) {
+        return getBuilder(getExistingFile(mcLoc("item/generated")), name);
     }
 
     private ItemModelBuilder getBuilder(ModelFile itemGenerated, String name) {
