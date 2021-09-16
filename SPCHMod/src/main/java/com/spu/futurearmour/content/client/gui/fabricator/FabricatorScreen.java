@@ -39,6 +39,8 @@ import org.jline.utils.Display;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
@@ -48,6 +50,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     public static final ResourceLocation PARTS_TWO_TEXTURE = new ResourceLocation(FutureArmour.MOD_ID, "textures/gui/fabricator_menu_parts_two.png");
 
     private RecipeManager recipeManager;
+    private List<FabricatorRecipe> fabricatorRecipes;
     private FabricatorCraftButton craftButton;
     private FabricatorTabChangeButton panelChangeButton;
     private AbstractSlider previewModelSlider;
@@ -61,6 +64,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     @Override
     protected void init() {
         recipeManager = menu.getWorld().getRecipeManager();
+        fabricatorRecipes = recipeManager.getAllRecipesFor(RecipeTypesRegistry.FABRICATING_RECIPE);
         super.init();
         craftButton = addCraftButton();
         panelChangeButton = addTabChangeButton();
@@ -110,15 +114,22 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
     //region RecipeTab
     private void renderRecipes(MatrixStack matrixStack, float sliderValue) {
+        int listsVisualLength = fabricatorRecipes.size() * 29;
+        int globalYOffset = (int) ((float) listsVisualLength * sliderValue);
+        int firstIndexToRender = globalYOffset / 29;
+        firstIndexToRender = Math.max(0, Math.min(firstIndexToRender, fabricatorRecipes.size() - 1));
+        int negativeYOffset = globalYOffset % 29;
+
         Vector3i centerPos = centerPosForSize(152, 28);
         int windowHeight = minecraft.getWindow().getHeight();
         int windowWidth = minecraft.getWindow().getWidth();
-        RenderSystem.enableScissor(0, (int)(((float)windowHeight/2.15F)),
-                windowWidth, windowHeight);
+        RenderSystem.enableScissor(0, (int) ((float) windowHeight / 2.15F),
+                windowWidth, (int) ((float) windowHeight / 2.42F));
         for (int i = 0; i < 8; i++) {
-            int yPos = (centerPos.getY() - 75) + (i * 29);
-            renderRecipeItem(matrixStack, yPos, recipeManager.getAllRecipesFor(RecipeTypesRegistry.FABRICATING_RECIPE).get(0));
-
+            if (firstIndexToRender + i >= fabricatorRecipes.size()) continue;
+            int yPos = (centerPos.getY() - 75) + (i * 29) - negativeYOffset;
+            FabricatorRecipe recipeToRender = fabricatorRecipes.get(firstIndexToRender + i);
+            renderRecipeItem(matrixStack, yPos, recipeToRender);
         }
         RenderSystem.disableScissor();
     }
@@ -128,8 +139,9 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         minecraft.getTextureManager().bind(PARTS_TWO_TEXTURE);
         Vector3i centerPos = centerPosForSize(151, 28);
         int xPos = centerPos.getX() - 62;
-
         blit(matrixStack, xPos, yPos, 83, 0, 151, 28, 256, 256);
+
+        minecraft.getItemRenderer().renderGuiItem(recipe.getResultItem().copy(), xPos + 8, yPos + 6);
     }
 
     private AbstractSlider addRecipesSlider() {

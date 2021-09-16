@@ -1,0 +1,20 @@
+{
+  "type": "futurearmour:fabricating",
+  "group": "futurearmour",
+  "time" : 240,
+  "pattern": [
+     "  ",
+     "x  ",
+    "    ",
+     "   "
+  ],
+  "key": {
+    "x": {
+      "item": "futurearmour:carbon_fiber"
+    }
+  },
+  "result": {
+    "item": "futurearmour:pilot_suit_chestplate",
+    "count": 1
+  }
+}
