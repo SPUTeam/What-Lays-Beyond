@@ -75,6 +75,11 @@ public class FabricatorRecipe implements IFabricatorRecipe {
         return Registry.RECIPE_TYPE.get(RECIPE_TYPE);
     }
 
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
     public int getTime() {
         return time;
     }
