@@ -9,6 +9,7 @@ import com.spu.futurearmour.content.client.gui.common.HorizontalSlider;
 import com.spu.futurearmour.content.client.gui.common.VerticalSlider;
 import com.spu.futurearmour.content.containers.FabricatorControllerContainer;
 import com.spu.futurearmour.content.network.Networking;
+import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageFabricatorAssembleRecipe;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
 import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.setup.ItemRegistry;
@@ -185,7 +186,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     private void onClickMouseItemWithRecipe(FabricatorRecipe recipe){
         currentPreviewStack = recipe.getResultItem().copy();
         changeLeftTab();
-        LOGGER.debug("clicked on: " + recipe.getResultItem().getDisplayName().getString());
+        Networking.simpleChannel.sendToServer(new CTSMessageFabricatorAssembleRecipe(menu.getFabricatorPosition(), recipe.getId()));
     }
 
     private HashMap<Item, Integer> prepareIngredientsMapForRecipe(FabricatorRecipe recipe) {

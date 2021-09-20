@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class FabricatorControllerTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
     public static final int INPUT_SLOTS_COUNT = 12;
@@ -158,7 +159,6 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
 
     private void updateStateData(int craftTicksElapsed) {
         int maxTicksForCurrentRecipe = fabricatorStateData.get(1);
-        //clamp 0,maxTicks (thanks java, very cool)
         int validatedTicksLeft = craftTicksElapsed > maxTicksForCurrentRecipe ? maxTicksForCurrentRecipe : Math.max(craftTicksElapsed, 0);
         fabricatorStateData.set(0, validatedTicksLeft);
     }
@@ -177,12 +177,23 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         fabricatorStateData.set(1, maxTicksForRecipe);
     }
 
+    //Called by Network Message Handler
     public void toggleCrafting(boolean nextState){
         if (this.level.isClientSide()) return;
 
         this.craftingIsOn = nextState;
         int asInt = this.craftingIsOn ? 1 : 0;
         fabricatorStateData.set(2, asInt);
+    }
+
+    //Called by Network Message Handler
+    public void tryArrangeRecipe(ResourceLocation recipeID){
+        if (this.level.isClientSide()) return;
+
+        Optional<FabricatorRecipe> recipe = (Optional<FabricatorRecipe>) level.getRecipeManager().byKey(recipeID);
+        if(!recipe.isPresent())return;
+
+        LOGGER.debug("GOT ON SERVER: " + recipe.get().getResultItem().getDisplayName().getString());
     }
     //endregion
 

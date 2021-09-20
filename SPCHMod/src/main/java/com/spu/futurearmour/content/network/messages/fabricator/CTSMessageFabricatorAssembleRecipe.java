@@ -1,23 +1,24 @@
 package com.spu.futurearmour.content.network.messages.fabricator;
 
+import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3i;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CTSMessageToggleFabricatorCrafting {
+public class CTSMessageFabricatorAssembleRecipe {
     private boolean messageIsValid;
-    private boolean nextStateIsOn;
+    private ResourceLocation recipeID;
     private Vector3i fabricatorPosition;
 
-    public CTSMessageToggleFabricatorCrafting(Vector3i fabricatorPosition, boolean nextStateIsOn){
+    public CTSMessageFabricatorAssembleRecipe(Vector3i fabricatorPosition, ResourceLocation recipeID){
         this.fabricatorPosition = fabricatorPosition;
-        this.nextStateIsOn = nextStateIsOn;
+        this.recipeID = recipeID;
         this.messageIsValid = true;
     }
 
-    private CTSMessageToggleFabricatorCrafting() {
+    private CTSMessageFabricatorAssembleRecipe() {
         messageIsValid = false;
     }
 
@@ -25,20 +26,20 @@ public class CTSMessageToggleFabricatorCrafting {
         return fabricatorPosition;
     }
 
-    public boolean getNextStateIsOn(){
-        return nextStateIsOn;
+    public ResourceLocation getRecipeID(){
+        return recipeID;
     }
 
-    public static CTSMessageToggleFabricatorCrafting decode(PacketBuffer buffer) {
-        CTSMessageToggleFabricatorCrafting result = new CTSMessageToggleFabricatorCrafting();
+    public static CTSMessageFabricatorAssembleRecipe decode(PacketBuffer buffer) {
+        CTSMessageFabricatorAssembleRecipe result = new CTSMessageFabricatorAssembleRecipe();
         try {
-            result.nextStateIsOn = buffer.readBoolean();
+            result.recipeID = buffer.readResourceLocation();
             int x = buffer.readInt();
             int y = buffer.readInt();
             int z = buffer.readInt();
             result.fabricatorPosition = new Vector3i(x,y,z);
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            LOGGER.warn("Exception while reading CTSMessageToggleFabricatorCrafting: " + e);
+            LOGGER.warn("Exception while reading CTSMessageFabricatorAssembleRecipe: " + e);
             return result;
         }
         result.messageIsValid = true;
@@ -47,7 +48,7 @@ public class CTSMessageToggleFabricatorCrafting {
 
     public void encode(PacketBuffer buffer) {
         if (!messageIsValid) return;
-        buffer.writeBoolean(nextStateIsOn);
+        buffer.writeResourceLocation(recipeID);
         buffer.writeInt(fabricatorPosition.getX());
         buffer.writeInt(fabricatorPosition.getY());
         buffer.writeInt(fabricatorPosition.getZ());
@@ -59,7 +60,7 @@ public class CTSMessageToggleFabricatorCrafting {
 
     @Override
     public String toString() {
-        return "CTSMessageToggleFabricatorCrafting[nextStateIsOn=" + nextStateIsOn + "]";
+        return "CTSMessageFabricatorAssembleRecipe[recipeID=" + recipeID + "]";
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

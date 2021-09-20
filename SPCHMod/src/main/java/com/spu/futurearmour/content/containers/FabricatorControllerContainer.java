@@ -124,8 +124,6 @@ public class FabricatorControllerContainer extends Container {
         int y = fabricatorStateData.get(4);
         int z = fabricatorStateData.get(5);
 
-        LOGGER.debug(fabricatorStateData.get(2));
-
         return new Vector3i(x,y,z);
     }
 

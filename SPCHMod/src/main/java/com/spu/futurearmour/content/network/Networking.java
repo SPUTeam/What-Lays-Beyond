@@ -1,7 +1,9 @@
 package com.spu.futurearmour.content.network;
 
 import com.spu.futurearmour.FutureArmour;
+import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageFabricatorAssembleRecipe;
 import com.spu.futurearmour.content.network.messages.fabricator.CTSMessageToggleFabricatorCrafting;
+import com.spu.futurearmour.content.network.messages.fabricator.SHandlerFabricatorAssembleRecipe;
 import com.spu.futurearmour.content.network.messages.fabricator.SHandlerToggleFabricatorCrafting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -17,6 +19,7 @@ public class Networking {
     public static SimpleChannel simpleChannel;
 
     public static final byte TOGGLE_FABRICATOR_ID = 47;
+    public static final byte ASSEMBLE_RECIPE_FABRICATOR_ID = 69;
 
     public static void registerMessages(){
         simpleChannel = NetworkRegistry.newSimpleChannel(simpleChannelRL,
@@ -24,13 +27,19 @@ public class Networking {
                 Networking::isThisProtocolAcceptedByClient,
                 Networking::isThisProtocolAcceptedByServer);
 
+        simpleChannel.registerMessage(ASSEMBLE_RECIPE_FABRICATOR_ID,
+                CTSMessageFabricatorAssembleRecipe.class,
+                CTSMessageFabricatorAssembleRecipe::encode,
+                CTSMessageFabricatorAssembleRecipe::decode,
+                SHandlerFabricatorAssembleRecipe::onMessageReceived,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+
         simpleChannel.registerMessage(TOGGLE_FABRICATOR_ID,
                 CTSMessageToggleFabricatorCrafting.class,
                 CTSMessageToggleFabricatorCrafting::encode,
                 CTSMessageToggleFabricatorCrafting::decode,
                 SHandlerToggleFabricatorCrafting::onMessageReceived,
-                Optional.of(NetworkDirection.PLAY_TO_SERVER)
-                );
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
     }
 
     public static boolean isThisProtocolAcceptedByServer(String protocolVersion) {
