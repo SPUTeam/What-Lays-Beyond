@@ -45,10 +45,8 @@ import org.jline.utils.Display;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
@@ -63,6 +61,8 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     private FabricatorTabChangeButton panelChangeButton;
     private AbstractSlider previewModelSlider;
     private AbstractSlider recipesSlider;
+    private boolean mouseClicked = false;
+    private ItemStack currentPreviewStack;
     private FabricatorGuiTab currentTab = FabricatorGuiTab.PREVIEW;
 
     public FabricatorScreen(FabricatorControllerContainer container, PlayerInventory playerInventory, ITextComponent defaultName) {
@@ -78,6 +78,9 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         panelChangeButton = addTabChangeButton();
         previewModelSlider = addPreviewModelSlider();
         recipesSlider = addRecipesSlider();
+        int recipeCount = recipeManager.getAllRecipesFor(RecipeTypesRegistry.FABRICATING_RECIPE).size();
+        currentPreviewStack = recipeManager.getAllRecipesFor(RecipeTypesRegistry.FABRICATING_RECIPE)
+                .get(new Random(34972766).nextInt(recipeCount)).getResultItem().copy();
         changeLeftTab();
     }
 
@@ -92,11 +95,13 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
             }
         }
         if (currentTab == FabricatorGuiTab.PREVIEW)
-            this.renderItemStackForPreview(new ItemStack(ItemRegistry.PILOT_SUIT_CHESTPLATE.get().getItem()), previewModelSlider.getSliderValue());
+            this.renderItemStackForPreview(currentPreviewStack, previewModelSlider.getSliderValue());
         if (currentTab == FabricatorGuiTab.RECIPES)
-            this.renderRecipes(matrixStack, recipesSlider.getSliderValue());
+            this.renderRecipes(matrixStack, recipesSlider.getSliderValue(), x, y);
+        mouseClicked = false;
         this.renderTooltip(matrixStack, x, y);
         this.updateCraftingButton();
+        this.mouseClicked = false;
     }
 
     @Override
@@ -115,7 +120,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
     //region Left Tabs
 
     //region RecipeTab
-    private void renderRecipes(MatrixStack matrixStack, float sliderValue) {
+    private void renderRecipes(MatrixStack matrixStack, float sliderValue, int mouseX, int mouseY) {
         int listsVisualLength = fabricatorRecipes.size() * 36;
         int globalYOffset = (int) ((float) listsVisualLength * sliderValue);
         int firstIndexToRender = globalYOffset / 36;
@@ -125,51 +130,63 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         Vector3i centerPos = centerPosForSize(152, 36);
         int scaledHeight = minecraft.getWindow().getGuiScaledHeight();
         int scale = (int) minecraft.getWindow().getGuiScale();
-        int scissorBoxBottomYPixel = (int) ((((double) scaledHeight / 2) - 9) * scale);
-        int scissorBoxTopYPixel = (int) ((double) 98 * scale);
-        RenderSystem.enableScissor(0, scissorBoxBottomYPixel,
-                minecraft.getWindow().getWidth(), scissorBoxTopYPixel);
+        int scissorBoxBottom = ((scaledHeight / 2) - 9);
+        int scissorBoxHeight = 98;
+        RenderSystem.enableScissor(0, scissorBoxBottom * scale,
+                minecraft.getWindow().getWidth(), scissorBoxHeight * scale);
 
         for (int i = 0; i < 4; i++) {
-            if (firstIndexToRender + i >= fabricatorRecipes.size()) continue;
             int yPos = (centerPos.getY() - 75) + (i * 37) - negativeYOffset;
+            boolean isHovered = mouseY >= Math.max(yPos, scaledHeight - scissorBoxBottom - scissorBoxHeight)
+                    && mouseY <= Math.min(yPos + 36, scaledHeight - scissorBoxBottom)
+                    && mouseX >= centerPos.getX() - 62
+                    && mouseX <= centerPos.getX() - 62 + 152;
+
+            if (firstIndexToRender + i >= fabricatorRecipes.size()) continue;
             FabricatorRecipe recipeToRender = fabricatorRecipes.get(firstIndexToRender + i);
-            renderRecipeItem(matrixStack, yPos, recipeToRender);
+            renderRecipeItem(matrixStack, yPos, recipeToRender, isHovered);
+
+            if(isHovered && mouseClicked)onClickMouseItemWithRecipe(recipeToRender);
         }
 
         RenderSystem.disableScissor();
     }
 
-    private void renderRecipeItem(MatrixStack matrixStack, int yPos, FabricatorRecipe recipe) {
+    private void renderRecipeItem(MatrixStack matrixStack, int yPos, FabricatorRecipe recipe, boolean hovered) {
         RenderSystem.color4f(1, 1, 1, 1);
         minecraft.getTextureManager().bind(PARTS_TWO_TEXTURE);
         Vector3i centerPos = centerPosForSize(152, 36);
         int xPos = centerPos.getX() - 62;
         RenderSystem.enableBlend();
-        blit(matrixStack, xPos, yPos, 83, 0, 151, 36);
+        int texYOffset = hovered ? 37 : 0;
+        blit(matrixStack, xPos, yPos, 83, texYOffset, 151, 36);
         RenderSystem.disableBlend();
         minecraft.getItemRenderer().renderGuiItem(recipe.getResultItem().copy(), xPos + 8, yPos + 10);
         String name = recipe.getResultItem().getDisplayName().getString();
         name = name.substring(1, name.length() - 1);
-        if (name.length() >= 14) {
-            name = name.substring(0, 13);
+        if (name.length() >= 19) {
+            name = name.substring(0, 18);
             name += "...";
         }
         xPos += 28;
         drawString(matrixStack, font, name, xPos, yPos + 7, 16747520);
         HashMap<Item, Integer> ingredientMap = prepareIngredientsMapForRecipe(recipe);
         for (Map.Entry<Item, Integer> entry : ingredientMap.entrySet()) {
-            RenderSystem.scalef(0.6F,0.6F, 1F);
-            itemRenderer.renderGuiItem(new ItemStack(entry.getKey()), (int)(1.66F*(xPos)),(int)(1.66F*(yPos + 20)));
-            RenderSystem.translatef(0,0,300F);
-            drawString(matrixStack, font, entry.getValue().toString(), (int)(1.66F * xPos) + 12, (int)(1.66F * yPos) + 45, 16747520);
-            RenderSystem.translatef(0,0,-300F);
-            RenderSystem.scalef(1.66F,1.66F, 1F);
-            xPos+=12;
+            RenderSystem.scalef(0.6F, 0.6F, 1F);
+            itemRenderer.renderGuiItem(new ItemStack(entry.getKey()), (int) (1.66F * (xPos)), (int) (1.66F * (yPos + 20)));
+            RenderSystem.translatef(0, 0, 300F);
+            drawString(matrixStack, font, entry.getValue().toString(), (int) (1.66F * xPos) + 12, (int) (1.66F * yPos) + 45, 16747520);
+            RenderSystem.translatef(0, 0, -300F);
+            RenderSystem.scalef(1.66F, 1.66F, 1F);
+            xPos += 12;
         }
     }
 
-
+    private void onClickMouseItemWithRecipe(FabricatorRecipe recipe){
+        currentPreviewStack = recipe.getResultItem().copy();
+        changeLeftTab();
+        LOGGER.debug("clicked on: " + recipe.getResultItem().getDisplayName().getString());
+    }
 
     private HashMap<Item, Integer> prepareIngredientsMapForRecipe(FabricatorRecipe recipe) {
         HashMap<Item, Integer> result = new HashMap<>();
@@ -387,6 +404,12 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
 
         int rightPosX = centerPos.getX() + 295;
         blit(matrixStack, rightPosX, centerPos.getY(), 222, 0, 34, this.imageHeight);
+    }
+
+    @Override
+    public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {
+        mouseClicked = true;
+        return super.mouseClicked(p_231044_1_, p_231044_3_, p_231044_5_);
     }
 
     private Vector3i centerPosForSize(int xSize, int ySize) {
