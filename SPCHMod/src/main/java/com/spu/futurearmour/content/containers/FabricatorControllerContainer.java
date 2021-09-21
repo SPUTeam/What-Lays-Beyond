@@ -94,6 +94,18 @@ public class FabricatorControllerContainer extends Container {
 
     @Override
     public ItemStack quickMoveStack(PlayerEntity player, int index) {
+        ItemStack itemstack;
+        Slot slot = this.slots.get(index);
+        if (slot == null || slot.getItem().isEmpty()) return ItemStack.EMPTY;
+        itemstack = slot.getItem();
+
+        if (index < 15) {
+            if (!this.moveItemStackTo(itemstack, 15, 50, false)) {
+                slot.setChanged();
+                return ItemStack.EMPTY;
+            }
+        }
+
         return ItemStack.EMPTY;
     }
 
@@ -114,21 +126,21 @@ public class FabricatorControllerContainer extends Container {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public boolean getCraftingIsOn(){
+    public boolean getCraftingIsOn() {
         return fabricatorStateData.get(2) == 1;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Vector3i getFabricatorPosition(){
+    public Vector3i getFabricatorPosition() {
         int x = fabricatorStateData.get(3);
         int y = fabricatorStateData.get(4);
         int z = fabricatorStateData.get(5);
 
-        return new Vector3i(x,y,z);
+        return new Vector3i(x, y, z);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public World getWorld(){
+    public World getWorld() {
         return world;
     }
 

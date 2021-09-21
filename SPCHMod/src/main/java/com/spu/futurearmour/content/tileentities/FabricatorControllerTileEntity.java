@@ -15,9 +15,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -177,6 +179,13 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
         fabricatorStateData.set(1, maxTicksForRecipe);
     }
 
+    private void transferInputToPlayerInventory(PlayerInventory playerInventory){
+        for(int i = 0; i < inputInventory.getContainerSize(); i++){
+            if(inputInventory.getItem(i).isEmpty())continue;
+            playerInventory.add(inputInventory.removeItem(i, inputInventory.getItem(i).getCount()));
+        }
+    }
+
     //Called by Network Message Handler
     public void toggleCrafting(boolean nextState){
         if (this.level.isClientSide()) return;
@@ -187,13 +196,28 @@ public class FabricatorControllerTileEntity extends TileEntity implements ITicka
     }
 
     //Called by Network Message Handler
-    public void tryArrangeRecipe(ResourceLocation recipeID){
+    public void tryArrangeRecipe(ResourceLocation recipeID, PlayerInventory playerInventory){
         if (this.level.isClientSide()) return;
 
-        Optional<FabricatorRecipe> recipe = (Optional<FabricatorRecipe>) level.getRecipeManager().byKey(recipeID);
-        if(!recipe.isPresent())return;
+        Optional<FabricatorRecipe> recipeOpt = (Optional<FabricatorRecipe>) level.getRecipeManager().byKey(recipeID);
+        if(!recipeOpt.isPresent())return;
+        FabricatorRecipe recipe = recipeOpt.get();
 
-        LOGGER.debug("GOT ON SERVER: " + recipe.get().getResultItem().getDisplayName().getString());
+        transferInputToPlayerInventory(playerInventory);
+        for(int i = 0; i < inputInventory.getContainerSize(); i++){
+            Ingredient ingredient = recipe.getIngredients().get(i);
+            if(ingredient.isEmpty()
+                    || !playerInventory.contains(ingredient.getItems()[0]))continue;
+
+            for(int k = 0; k < 36; k++){
+                ItemStack invStack = playerInventory.getItem(k);
+                ItemStack ingredientStack = ingredient.getItems()[0];
+                if(invStack.sameItem(ingredientStack)){
+                    ItemStack removedStack = playerInventory.removeItem(k, 1);
+                    inputInventory.setItem(i, removedStack);
+                }
+            }
+        }
     }
     //endregion
 

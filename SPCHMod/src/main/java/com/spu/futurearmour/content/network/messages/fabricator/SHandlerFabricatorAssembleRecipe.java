@@ -43,7 +43,7 @@ public class SHandlerFabricatorAssembleRecipe {
         TileEntity entity = world.getBlockEntity(new BlockPos(message.getFabricatorPosition()));
         if(entity instanceof FabricatorControllerTileEntity){
             FabricatorControllerTileEntity fabricator = (FabricatorControllerTileEntity) entity;
-            fabricator.tryArrangeRecipe(message.getRecipeID());
+            fabricator.tryArrangeRecipe(message.getRecipeID(), sendingPlayer.inventory);
         }
     }
 

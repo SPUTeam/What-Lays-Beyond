@@ -219,8 +219,8 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         IBakedModel bakedModel = itemRenderer.getModel(stack, null, null);
         RenderSystem.pushMatrix();
         Vector3i centerPos = centerPosForSize(150, 150);
-        int x = (centerPos.getX() + 17);
-        int y = (centerPos.getY() + 58);
+        int x = (centerPos.getX() + 12);
+        int y = (centerPos.getY() + 54);
 
         Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
         Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(false, false);
@@ -232,7 +232,7 @@ public class FabricatorScreen extends ContainerScreen<FabricatorControllerContai
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.translatef((float) x, (float) y, 150.0F);
         RenderSystem.scalef(1.0F, -1.0F, 1.0F);
-        RenderSystem.scalef(192.0F, 192.0F, 1.0F);
+        RenderSystem.scalef(160.0F, 160.0F, 1.0F);
         RenderSystem.rotatef((250 * rotation01) - 25, 0, 1, 0);
 
         MatrixStack matrixstack = new MatrixStack();
