@@ -6,7 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
 import com.spu.futurearmour.setup.RecipeTypesRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;

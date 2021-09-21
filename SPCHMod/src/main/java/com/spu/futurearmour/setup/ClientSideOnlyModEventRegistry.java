@@ -10,11 +10,11 @@ public class ClientSideOnlyModEventRegistry {
     }
 
     public void registerClientOnlyEvents(){
-        eventBus.register(com.spu.futurearmour.content.blocks.aluminium.StartupClientOnly.class);
-        eventBus.register(com.spu.futurearmour.content.blocks.copper.StartupClientOnly.class);
-        eventBus.register(com.spu.futurearmour.content.blocks.titanium.StartupClientOnly.class);
-        eventBus.register(com.spu.futurearmour.content.blocks.magnesium.StartupClientOnly.class);
-        eventBus.register(com.spu.futurearmour.content.blocks.sulfur.StartupClientOnly.class);
-        eventBus.register(com.spu.futurearmour.content.blocks.uranium.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.aluminium.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.copper.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.titanium.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.magnesium.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.sulfur.StartupClientOnly.class);
+        eventBus.register(com.spu.futurearmour.content.blocks.resources.uranium.StartupClientOnly.class);
     }
 }

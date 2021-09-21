@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "name": "fabricator_controller_block",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "futurearmour:fabricator_controller_block"
+        }
+      ]
+    }
+  ]
+}

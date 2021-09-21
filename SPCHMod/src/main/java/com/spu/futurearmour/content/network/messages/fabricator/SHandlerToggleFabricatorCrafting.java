@@ -1,26 +1,15 @@
 package com.spu.futurearmour.content.network.messages.fabricator;
 
-import com.spu.futurearmour.content.network.Networking;
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
-import net.minecraft.block.BlockState;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
-import net.minecraftforge.fml.loading.FMLClientLaunchProvider;
-import net.minecraftforge.fml.loading.FMLCommonLaunchHandler;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLServiceProvider;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class SHandlerToggleFabricatorCrafting {

@@ -1,8 +1,8 @@
 package com.spu.futurearmour.setup;
 
 import com.spu.futurearmour.FutureArmour;
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
-import com.spu.futurearmour.content.tileentities.FabricatorPartTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorPartTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;

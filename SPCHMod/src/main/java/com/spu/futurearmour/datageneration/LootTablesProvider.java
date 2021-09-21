@@ -20,5 +20,7 @@ public class LootTablesProvider extends BaseLootTablesProvider {
         lootTables.put(BlockRegistry.URANIUM_BLOCK.get(), createSimpleBlockTable("uranium_block", BlockRegistry.URANIUM_BLOCK.get()));
         lootTables.put(BlockRegistry.STEEL_BLOCK.get(), createSimpleBlockTable("steel_block", BlockRegistry.STEEL_BLOCK.get()));
         lootTables.put(BlockRegistry.URANIUMSTEEL_BLOCK.get(), createSimpleBlockTable("uraniumsteel_block", BlockRegistry.URANIUMSTEEL_BLOCK.get()));
+        lootTables.put(BlockRegistry.FABRICATOR_CONTROLLER_BLOCK.get(), createSimpleBlockTable("fabricator_controller_block", BlockRegistry.FABRICATOR_CONTROLLER_BLOCK.get()));
+        lootTables.put(BlockRegistry.FABRICATOR_PART_BLOCK.get(), createSimpleBlockTable("fabricator_part_block", BlockRegistry.FABRICATOR_PART_BLOCK.get()));
     }
 }

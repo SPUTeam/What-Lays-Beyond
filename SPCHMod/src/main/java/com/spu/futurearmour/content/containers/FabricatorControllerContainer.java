@@ -1,6 +1,6 @@
 package com.spu.futurearmour.content.containers;
 
-import com.spu.futurearmour.content.tileentities.FabricatorStateData;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorStateData;
 import com.spu.futurearmour.content.recipes.fabricator.FabricatorRecipe;
 import com.spu.futurearmour.content.tileentities.TileEntityZoneInventory;
 import com.spu.futurearmour.setup.ContainerTypeRegistry;
@@ -10,7 +10,6 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;

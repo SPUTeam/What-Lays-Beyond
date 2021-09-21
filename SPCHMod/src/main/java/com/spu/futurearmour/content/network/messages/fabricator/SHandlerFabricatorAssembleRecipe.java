@@ -1,6 +1,6 @@
 package com.spu.futurearmour.content.network.messages.fabricator;
 
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

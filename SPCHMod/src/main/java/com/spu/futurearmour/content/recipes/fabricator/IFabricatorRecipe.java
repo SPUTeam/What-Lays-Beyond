@@ -1,7 +1,7 @@
 package com.spu.futurearmour.content.recipes.fabricator;
 
 import com.spu.futurearmour.FutureArmour;
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;

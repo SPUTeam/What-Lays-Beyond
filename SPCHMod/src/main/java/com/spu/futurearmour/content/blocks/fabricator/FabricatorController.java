@@ -1,7 +1,6 @@
 package com.spu.futurearmour.content.blocks.fabricator;
 
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
-import com.spu.futurearmour.content.tileentities.FabricatorPartTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorControllerTileEntity;
 import com.spu.futurearmour.setup.ModBlockStateProperties;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -27,9 +26,9 @@ public class FabricatorController extends Block {
 
     public FabricatorController() {
         super(AbstractBlock.Properties.of(Material.HEAVY_METAL)
-        .strength(5)
-        .sound(SoundType.METAL)
-        .noOcclusion());
+                .strength(5)
+                .sound(SoundType.METAL)
+                .noOcclusion());
 
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
@@ -63,20 +62,23 @@ public class FabricatorController extends Block {
     @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public ActionResultType use(BlockState blockState, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        if(world.isClientSide()){
-            return getConnectedEntity(world, pos).isAssembled()? ActionResultType.SUCCESS : ActionResultType.PASS;
+        FabricatorControllerTileEntity entity = getConnectedEntity(world, pos);
+        if (entity == null) return ActionResultType.PASS;
+        if (world.isClientSide()) {
+            return entity.isAssembled() ? ActionResultType.SUCCESS : ActionResultType.PASS;
         }
-        getConnectedEntity(world, pos).playerInteract(player);
+        if (!entity.isAssembled()) return ActionResultType.PASS;
+        entity.playerInteract(player);
         return ActionResultType.CONSUME;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void onRemove(BlockState stateFrom, World world, BlockPos pos, BlockState stateTo, boolean moving) {
-        if(world.isClientSide())return;
+        if (world.isClientSide()) return;
         FabricatorControllerTileEntity entity = getConnectedEntity(world, pos);
         if (entity != null && (stateFrom.getBlock() != stateTo.getBlock())) {
-            entity.onBlockRemoved();
+            entity.onBlockRemoved(world, pos);
         }
         super.onRemove(stateFrom, world, pos, stateTo, moving);
     }

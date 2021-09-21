@@ -1,15 +1,18 @@
 package com.spu.futurearmour.content.blocks.fabricator;
 
-import com.spu.futurearmour.content.tileentities.FabricatorControllerTileEntity;
-import com.spu.futurearmour.content.tileentities.FabricatorPartTileEntity;
+import com.spu.futurearmour.content.tileentities.fabricator.FabricatorPartTileEntity;
 import com.spu.futurearmour.setup.ModBlockStateProperties;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -44,6 +47,19 @@ public class FabricatorPart extends Block {
 
     protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(MULTIBLOCK_ASSEMBLED);
+    }
+
+    @SuppressWarnings({"NullableProblems", "deprecation"})
+    @Override
+    public ActionResultType use(BlockState blockState, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        FabricatorPartTileEntity entity = getConnectedEntity(world, pos);
+        if(entity==null)return ActionResultType.PASS;
+        if(world.isClientSide()){
+            return entity.assembled ? ActionResultType.SUCCESS : ActionResultType.PASS;
+        }
+        if(!entity.assembled)return ActionResultType.PASS;
+        entity.playerInteract(player);
+        return ActionResultType.CONSUME;
     }
 
     @SuppressWarnings("deprecation")
